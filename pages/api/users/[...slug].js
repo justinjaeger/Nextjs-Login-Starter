@@ -1,4 +1,4 @@
-import tokenController from 'server/controllers/tokenController';
+import tokenController from 'controllers/tokenController';
 
 /**
  * Then if I want to fetch any data, I just do users / something

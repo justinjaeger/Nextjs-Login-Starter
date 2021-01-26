@@ -1,5 +1,5 @@
-import tokenController from 'server/controllers/tokenController';
-import loginController from 'server/controllers/loginController';
+import tokenController from 'controllers/tokenController';
+import loginController from 'controllers/loginController';
 
 /**
  * When the user clicks 'Log In'
