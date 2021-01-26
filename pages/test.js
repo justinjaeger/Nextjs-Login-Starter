@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import Header from 'containers/Header';
-import LoginContainer from 'containers/LoginContainer';
-
 export default function Home(props) { 
 
   // const { username } = props;
@@ -75,28 +72,31 @@ export default function Home(props) {
   };
 
   return (
-    <div id="App">
-      <Header
-        loggedIn={loggedIn}
-        logout={logout}
-        setRoute={redirect} 
-        username ={username}
-        showLoginDropdown={showLoginDropdown}
-      />
-
-      { (loginDropdown===true) && 
-        <LoginContainer
-          loggedIn={loggedIn} setLoggedIn={setLoggedIn}
-          route={loginRoute} setRoute={redirect}
-          username={username} setUsername={setUsername}
-          email={email} setEmail={setEmail}
-          message={loginMessage} setMessage={setLoginMessage}
-          error={loginError} setError={setLoginError}
-          xOut={xOut}
-          login={login}
-        />
-      }
+    <div id="Header">
+      My name is {username}
     </div>
+    // <div id="App">
+    //   <Header
+    //     loggedIn={loggedIn}
+    //     logout={logout}
+    //     setRoute={redirect} 
+    //     username ={username}
+    //     showLoginDropdown={showLoginDropdown}
+    //   />
+
+    //   { (loginDropdown===true) && 
+    //     <LoginContainer
+    //       loggedIn={loggedIn} setLoggedIn={setLoggedIn}
+    //       route={loginRoute} setRoute={redirect}
+    //       username={username} setUsername={setUsername}
+    //       email={email} setEmail={setEmail}
+    //       message={loginMessage} setMessage={setLoginMessage}
+    //       error={loginError} setError={setLoginError}
+    //       xOut={xOut}
+    //       login={login}
+    //     />
+    //   }
+    // </div>
   );
 };
  
@@ -110,7 +110,7 @@ export async function getServerSideProps(context) {
 
 /* Checks if user is logged in. If so, it populates the page with user data */
 
-    const res = await fetch(`${URL}/api/users`);
+    const res = await fetch(`${URL}/api/test`);
     const data = await res.json();
 
     return (data.username === undefined)

@@ -1,0 +1,39 @@
+@import 'styles/variables';
+
+@mixin flexRight() {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+@mixin centerText() {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin headerContent() {
+  margin: 0 5 0 5;
+  font-family: $oswald;
+}
+
+#Header {
+  @include flexRight();
+  background: $off-black;
+  color: $off-white;
+  width: 100%;
+  height: 30px;
+}
+
+#header-message {
+  @include centerText();
+  @include headerContent();
+  font-size: 14px;
+}
+
+.header-button {
+  @include headerContent();
+  &:hover {
+    color: $secondary;
+  } 
+}
