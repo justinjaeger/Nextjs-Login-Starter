@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-import tokenController from 'server/controllers/tokenController';
+import tokenController from 'controllers/tokenController';
 
 /**
  * Validates the access_token and returns { loggedIn: true, user_id }

@@ -1,4 +1,4 @@
-import db from 'server/connections/db';
+import db from 'lib/db';
 
 export default async function test(req, res) {
 

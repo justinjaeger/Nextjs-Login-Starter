@@ -1,4 +1,4 @@
-import tokenController from 'server/controllers/tokenController';
+import tokenController from 'controllers/tokenController';
 
 /**
  * When the user clicks 'Log Out'
