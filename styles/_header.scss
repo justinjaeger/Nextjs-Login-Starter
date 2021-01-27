@@ -33,6 +33,8 @@
 
 .header-button {
   @include headerContent();
+  color: $off-white;
+  padding: 5px;
   &:hover {
     color: $secondary;
   } 

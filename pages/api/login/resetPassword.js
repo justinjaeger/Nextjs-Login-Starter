@@ -43,7 +43,6 @@ export default async function resetPassword(req, res) {
   /* Return data to client / log them in */ 
   return res.json({
     loggedIn: true,
-    username: username,
-    email: email,
+    username: username
   });
 };

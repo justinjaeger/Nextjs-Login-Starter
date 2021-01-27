@@ -52,7 +52,7 @@ export default function Home(props) {
   function logout() {
     axios.get('/api/login/logout')
     .then(res => {
-      console.log('logged user out successfully');
+      if (res.data.error) return setError(res.data.error);
       setLoggedIn(false);
       setUsername('');
     })
@@ -71,7 +71,7 @@ export default function Home(props) {
   function redirect(entry) {
     setLoginRoute(entry);
     setLoginError('');
-    setLoginError('');
+    setLoginMessage('');
   };
 
   return (
@@ -82,6 +82,7 @@ export default function Home(props) {
         setRoute={redirect} 
         username ={username}
         showLoginDropdown={showLoginDropdown}
+        setMessage={setLoginMessage}
       />
 
       { (loginDropdown===true) && 
@@ -110,7 +111,7 @@ export async function getServerSideProps(context) {
 
 /* Checks if user is logged in. If so, it populates the page with user data */
 
-    const res = await fetch(`${URL}/api/users`);
+    const res = await fetch(`${URL}/api/user/home`);
     const data = await res.json();
 
     return (data.username === undefined)

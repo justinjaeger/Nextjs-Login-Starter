@@ -1,6 +1,6 @@
 import db from 'lib/db';
-const profanityFilter = require('middleware/profanityFilter');
-const usernameFilter = require('middleware/usernameFilter');
+const profanityFilter = require('helpers/profanityFilter');
+const usernameFilter = require('helpers/usernameFilter');
 const bcrypt = require('bcrypt');
 
 const signupController = {};
@@ -73,20 +73,20 @@ signupController.hashPassword = async (req, res, payload) => {
 
 /*************************************/
 
-signupController.createUser = (req, res, payload) => {
+signupController.createUser = async (req, res, payload) => {
 
   const { email, username, password } = payload;
 
   /* Create new user in database */
   query = `
     INSERT INTO users(email, username, password)
-    VALUES(${email}, ${username}, ${password})
+    VALUES("${email}", "${username}", "${password}")
   `;
   result = await db.query(query); 
   if (result.error) {
     /* Handle duplicate entry errors with an error message */
-    if (err.code === 'ER_DUP_ENTRY') {
-      return (err.sqlMessage.split('.')[1] === `username'`)
+    if (result.error.code === 'ER_DUP_ENTRY') {
+      return (result.error.sqlMessage.split('.')[1] === `username'`)
         ? { end: { error: 'This username is already registered.' } }
         : { end: { error: 'This email is already registered.' } }
     };
@@ -98,7 +98,7 @@ signupController.createUser = (req, res, payload) => {
 
 /*************************************/
 
-signupController.authenticateUser = (req, res, payload) => {
+signupController.authenticateUser = async (req, res, payload) => {
 
   const { username } = payload;
 
@@ -106,7 +106,7 @@ signupController.authenticateUser = (req, res, payload) => {
   query = `
     UPDATE users
     SET authenticated=1
-    WHERE username=${username}
+    WHERE username="${username}"
   `;
   
   result = await db.query(query); 
@@ -117,7 +117,7 @@ signupController.authenticateUser = (req, res, payload) => {
 
 /*************************************/
 
-signupController.getUserIdByUsername = (req, res, payload) => {
+signupController.getUserIdByUsername = async (req, res, payload) => {
 
   const { username } = payload;
 
@@ -125,7 +125,7 @@ signupController.getUserIdByUsername = (req, res, payload) => {
   query = `
     SELECT user_id
     FROM users
-    WHERE username=${username}
+    WHERE username="${username}"
   `;
   
   result = await db.query(query); 

@@ -10,7 +10,8 @@ function Header(props) {
     logout,
     setRoute, 
     username, 
-    showLoginDropdown 
+    showLoginDropdown,
+    setMessage
   } = props;
 
   return (
@@ -20,6 +21,7 @@ function Header(props) {
         <LoggedOut
           setRoute={setRoute}
           showLoginDropdown={showLoginDropdown}
+          setMessage={setMessage}
         />
       }
 

@@ -4,7 +4,7 @@ import loginController from 'controllers/loginController';
 
 
 /**
- * When the user submits "forgot password" form and an email is sent
+ * When the user submits "forgot password", which sends an email
  */
 let result, payload;
 export default async function sendPassResetEmail(req, res) {

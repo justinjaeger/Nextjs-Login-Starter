@@ -1,5 +1,5 @@
 const Cookies = require('cookies');
-const { encrypt, decrypt } = require('middleware/encrypt');
+const { encrypt, decrypt } = require('helpers/encrypt');
 
 /**
  * When the user clicks the link to verify their email,

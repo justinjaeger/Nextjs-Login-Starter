@@ -6,6 +6,7 @@ import loginController from 'controllers/loginController';
  */
  
 let result, payload;
+
 export default async function login(req, res) {
 
   const { emailOrUsername, password } = req.body;
@@ -17,7 +18,7 @@ export default async function login(req, res) {
   payload = { entryType, emailOrUsername };
   result = await loginController.returnUserData(req, res, payload);
   if (result.end) return res.json(result.end);
-
+  
   const { username, email, user_id, dbPassword, authenticated } = result;
 
   /* Verify Password */
@@ -41,6 +42,5 @@ export default async function login(req, res) {
   return res.json({
     loggedIn: true,
     username: username,
-    email: email,
   });
 };

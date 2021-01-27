@@ -1,5 +1,5 @@
 const Cookies = require('cookies');
-const { encrypt, decrypt } = require('middleware/encrypt');
+const { encrypt, decrypt } = require('helpers/encrypt');
 
 /**
  * When the user clicks the link to reset their password,
@@ -24,5 +24,5 @@ export default async function serveResetPassPage(req, res) {
   /* Has to redirect to main page */
   /* The main page should see the new cookie and proceed accordingly */
   return res.redirect('/');
-
+  
 };

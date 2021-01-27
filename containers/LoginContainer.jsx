@@ -25,9 +25,9 @@ const LoginContainer = (props) => {
   // RESEND VERIFICATION EMAIL
   function sendVerificationEmail(email, username) {
     const payload = { email, username };
-    axios.post('/signup/resend-verification', payload)
+    axios.post('/api/signup/resendVerification', payload)
     .then(res => {
-      console.log('resent verification email successfully');
+      if (res.data.error) return setError(res.data.error);
       setRoute('/blank');
       setMessage(res.data.message);
       displayResendEmailLink(false);

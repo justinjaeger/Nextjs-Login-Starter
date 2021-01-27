@@ -28,15 +28,19 @@ export default async function login(req, res) {
 
   const { hashedPassword } = result;
 
+  console.log('hashed password', hashedPassword)
+
   /* Create user */
   payload = { email, username, password: hashedPassword };
   result = await signupController.createUser(req, res, payload);
   if (result.end) return res.json(result.end);
 
   /* Send Verification Email */
-  payload = { email, username, password: hashedPassword };
+  payload = { email, username };
   result = await emailController.sendVerificationEmail(req, res, payload);
   if (result.end) return res.json(result.end);
 
-  return res.json({});
+  return res.json({
+    message: `Please verify the email sent to ${email}.`
+  });
 };

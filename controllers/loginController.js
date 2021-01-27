@@ -69,7 +69,7 @@ loginController.ifEmailNoExistDontSend = async (req, res, payload) => {
   query = `
     SELECT user_id 
     FROM users
-    WHERE email=${email}
+    WHERE email="${email}"
   `;
   result = await db.query(query);
   if (result.error) return { end: result.error };

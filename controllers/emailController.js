@@ -1,5 +1,5 @@
-const { encrypt, decrypt } = require('middleware/encrypt');
-const mailHelper = require('middleware/mailHelper');
+const { encrypt, decrypt } = require('helpers/encrypt');
+const mailHelper = require('helpers/mailHelper');
 
 const emailController = {};
 
