@@ -4,9 +4,8 @@ import loginController from 'controllers/loginController';
 /**
  * When the user clicks 'Log In'
  */
-
+ 
 let result, payload;
-
 export default async function login(req, res) {
 
   const { emailOrUsername, password } = req.body;
@@ -14,10 +13,11 @@ export default async function login(req, res) {
   /* Determine entrytype - email or username */
   const entryType = (emailOrUsername.includes('@')) ? 'email' : 'username';
 
-  /* Return User Data */
+  /* Return User Data - use it to authenticate */
   payload = { entryType, emailOrUsername };
   result = await loginController.returnUserData(req, res, payload);
   if (result.end) return res.json(result.end);
+
   const { username, email, user_id, dbPassword, authenticated } = result;
 
   /* Verify Password */
@@ -34,7 +34,7 @@ export default async function login(req, res) {
 
   /* Create Access Token */
   payload = { user_id };
-  await tokenController.createAccessToken(req, res, payload);
+  result = await tokenController.createAccessToken(req, res, payload);
   if (result.end) return res.json(result.end);
 
   /* Return data to client */ 

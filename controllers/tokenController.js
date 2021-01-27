@@ -53,7 +53,7 @@ tokenController.deleteAccessToken = async (req, res, payload) => {
     DELETE FROM tokens
     WHERE access_token=${access_token}
   `;
-  const result = await db.query(query);
+  result = await db.query(query);
   if (result.error) return { end: result.error };
 
   // if it affected no rows, that means a hacker already used the access token

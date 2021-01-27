@@ -35,8 +35,8 @@ const verificationEmail = (email, url, username) => {
     subject: 'Reset your password',
     text: `Please click the link to reset your password`, 
     html: `
-      <div>Click this link to verify your email</div>
-      <button><a href="${url}">Verify Email</a></button>
+      <div>Click this link to reset your password</div>
+      <button><a href="${url}">Reset Password</a></button>
     `,
   };
 
