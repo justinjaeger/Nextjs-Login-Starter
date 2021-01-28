@@ -66,7 +66,7 @@ tokenController.createAccessToken = async (req, res, payload) => {
 
   /* CREATE ACCESS TOKEN */
   const accessPayload = { user_id };
-  const accessOptions = { expiresIn: '5s'}; /* change the expiration here */
+  const accessOptions = { expiresIn: '10m'}; /* change the expiration here */
   const access_token = jwt.sign(accessPayload,  process.env.ACCESS_TOKEN_SECRET, accessOptions);
   
   /* SAVE TOKEN IN DB */
