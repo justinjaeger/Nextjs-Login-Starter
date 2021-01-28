@@ -1,27 +1,25 @@
-import tokenController from 'controllers/tokenController';
 import loginController from 'controllers/loginController';
+import emailController from 'controllers/emailController';
 import signupController from 'controllers/signupController';
 
 /**
- * When the user clicks Reset Password
+ * When the user clicks 'Sign Up'
  */
  
 let result, payload;
-export default async function resetPassword(req, res) {
+export default async function login(req, res) {
 
-  const { email, password, confirmPassword } = req.body;
+  const { email, username, password, confirmPassword } = req.body;
 
-  /* Return User Data - use it to authenticate */
-  payload = { entryType: 'email', emailOrUsername: email };
-  result = await loginController.returnUserData(req, res, payload);
+  /* Validate email and username */
+  payload = { email, username };
+  result = await signupController.validateEmailAndUsername(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
     return res.json(result.end);
   };
 
-  const { username, user_id } = result;
-
-  /* Validate Password - signup */
+  /* Validate password */
   payload = { password, confirmPassword };
   result = await signupController.validatePassword(req, res, payload);
   if (result.end) {
@@ -29,7 +27,7 @@ export default async function resetPassword(req, res) {
     return res.json(result.end);
   };
 
-  /* Hash Password - signup */
+  /* Hash password */
   payload = { password };
   result = await signupController.hashPassword(req, res, payload);
   if (result.end) {
@@ -39,25 +37,25 @@ export default async function resetPassword(req, res) {
 
   const { hashedPassword } = result;
 
-  /* Update Password - login */
-  payload = { hashedPassword, user_id };
-  result = await loginController.updatePassword(req, res, payload);
+  console.log('hashed password', hashedPassword)
+
+  /* Create user */
+  payload = { email, username, password: hashedPassword };
+  result = await signupController.createUser(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
     return res.json(result.end);
   };
 
-  /* Create Access Token */
-  payload = { user_id };
-  await tokenController.createAccessToken(req, res, payload);
+  /* Send Verification Email */
+  payload = { email, username };
+  result = await emailController.sendVerificationEmail(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
     return res.json(result.end);
   };
 
-  /* Return data to client / log them in */ 
   return res.json({
-    loggedIn: true,
-    username: username
+    message: `Please verify the email sent to ${email}.`
   });
 };

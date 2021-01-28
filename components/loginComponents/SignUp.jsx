@@ -22,19 +22,14 @@ function SignUp(props) {
       confirmPassword
     };
 
-    console.log('submitted', payload);
-
     /* NOTE: The /signup POST request will send the user a verification email, so it won't return anything back except a message */
-    axios.post('/signup', payload)
+    axios.post('/api/signup', payload)
       .then(res => {
-        /* whether we get 202 (error message) or 200 (tells us to check email), we want to display the message */
-        if (res.data.message) setMessage(res.data.message);
-        if (res.data.error) setError(res.data.error);
-        
-        if (res.status === 200) {
-          setRoute('/blank');
-          displayResendEmailLink({ email, username });
-        };
+        console.log('message?', res.data)
+        if (res.data.error) return setError(res.data.error);       
+        setRoute('/blank');
+        displayResendEmailLink({ email, username });
+        setMessage(res.data.message); 
       })
       .catch(err => {
         console.log('error in signup', err.response);
@@ -53,7 +48,7 @@ function SignUp(props) {
           autoFocus
           type="text"
           value={email}
-          onChange={(e) => setEmail(e.target.value)} /* so it actually updates visually when you type */
+          onChange={(e) => setEmail(e.target.value)} /* so it updates visually when you type */
         />
 
         <div className="login-form-label">Username</div>          

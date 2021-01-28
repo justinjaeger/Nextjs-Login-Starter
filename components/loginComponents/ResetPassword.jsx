@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 
-function SignUp(props) {
+function ResetPassword(props) {
 
   const { setMessage, setError, email, login } = props;
   const [password, setPassword] = useState("");
@@ -12,27 +12,15 @@ function SignUp(props) {
   };
 
   function handleSubmit(event) {
-
     const payload = {
-      emailOrUsername: email,
+      email,
       password,
       confirmPassword
     };
-
-    console.log('submitted', payload);
-
-    /* NOTE: The /signup POST request will send the user a verification email, so it won't return anything back except a message */
-    
-    axios.post('/login/changePasswordAndLogin', payload)
+    axios.post('/api/login/resetPassword', payload)
       .then(res => {
-        /* when something about the input is wrong, server sends 202 with message */
-        if (res.status === 202) {
-          if (res.data.message) setMessage(res.data.message);
-          if (res.data.error) setError(res.data.error);
-        } else if (res.status === 200) {
-          console.log('logged user in successfully', res.data);
-          login(res.data); // log user in & send user data
-        };
+        if (res.data.error) return setError(res.data.error);
+        login(res.data); // log user in & send user data
       })
       .catch(err => {
         console.log('something broke - did not log user in after changing password', err.response);
@@ -69,4 +57,4 @@ function SignUp(props) {
   );
 };
 
-export default SignUp;
+export default ResetPassword;

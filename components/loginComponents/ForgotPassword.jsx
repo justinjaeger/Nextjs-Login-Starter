@@ -16,15 +16,11 @@ function ForgotPassword(props) {
 
     /* NOTE: The /signup POST request will send the user a verification email, so it won't return anything back except a message */
     
-    axios.post('/login/forgotPassword', payload)
+    axios.post('/api/login/sendPassResetEmail', payload)
       .then(res => {
-        console.log('got a response in forgotPassword')
-        /* whether we get 202 (error message) or 200 (tells us to check email), we want to display the message */
-        if (res.data.message) setMessage(res.data.message);
-        if (res.data.error) setError(res.data.error);
-        if (res.status === 200) {
-          setRoute('/blank');
-        };
+        if (res.data.error) return setError(res.data.error);
+        setRoute('/blank');
+        setMessage(res.data.message);
       })
       .catch(err => {
         console.log('err', err.response);

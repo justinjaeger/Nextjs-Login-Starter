@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 
 function LoggedOut(props) {
-  const { setRoute, showLoginDropdown } = props;
+  const { setRoute, setLoginDropdown, setMessage } = props;
 
   function handleClick(route) {
     // Displays login dropdown and sets route
-    showLoginDropdown(true);
+    setLoginDropdown(true);
     setRoute(route);
+    setMessage('');
   };
 
   return (
