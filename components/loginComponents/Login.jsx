@@ -27,16 +27,19 @@ function Login(props) {
     axios.post('/api/login', payload)
       .then(res => {
         if (res.data.error) return setError(res.data.error);
-        /* when something about the input is wrong, server sends 202 with message */
-        if (res.data.email) { // idk what this does
+
+        /* If email is in the body, it means user is not authenticated */
+        if (res.data.email) {
+          console.log('not authenticated...')
           displayResendEmailLink({ email: res.data.email, username: res.data.username });
           setRoute('/blank');
+          setMessage(res.data.message);
           return;
         };
-        login(res.data); /* log user in & send user data */
+        return login(res.data); /* log user in & send user data */
       })
       .catch(err => {
-        console.log('something broke trying to log user in', err.response);
+        if (err) console.log('something went wrong trying to log user in', err);
       })
 
     event.preventDefault(); /** prevents it from refreshing */

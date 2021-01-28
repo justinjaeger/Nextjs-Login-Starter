@@ -1,40 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import cookies from 'next-cookies'
 
 import Header from 'containers/Header';
 import LoginContainer from 'containers/LoginContainer';
 
 export default function Home(props) { 
 
-  // const { username } = props;
-
   const [loggedIn, setLoggedIn] = useState(props.loggedIn);
-  const [loginDropdown, showLoginDropdown] = useState(false);
+  const [loginDropdown, setLoginDropdown] = useState(false);
   const [loginRoute, setLoginRoute] = useState('/');
   const [loginMessage, setLoginMessage] = useState('');
   const [loginError, setLoginError] = useState('');
   const [username, setUsername] = useState(props.username);
   const [email, setEmail] = useState(''); 
+  const [resendEmailLink, displayResendEmailLink] = useState(false);
 
   useEffect(() => {
     console.log('useEffect firing');
+    console.log('props', props);
 
-    /* authenticated cookie exists affter we click the verification link in our email */
-    if (document.cookie.includes('authenticated')) {
-      const username = decodeURIComponent(document.cookie.split('XXX')[1]);
-      setLoginRoute("/login");
-      showLoginDropdown(true);
-      setUsername(username);
-      setLoginMessage("Email verified. Please enter your password");
-    };
-
-    /* reset_password cookie exists after we click the reset password link in our email */
-    if (document.cookie.includes('reset_password')) {
-      const email = decodeURIComponent(document.cookie.split('XXX')[1]);
-      setLoginRoute("/resetPassword");
-      showLoginDropdown(true);
-      setEmail(email);
-      setLoginMessage(`Please enter a new password for ${email}`);
+    if (props.renderFromCookie) {
+      console.log('rendering from cookie')
+      if (props.loginRoute) setLoginRoute(props.loginRoute);
+      if (props.email) setLoginRoute(props.email);
+      if (props.loginDropdown) setLoginDropdown(props.loginDropdown);
+      if (props.loginMessage) setLoginMessage(props.loginMessage);
     };
 
   }, [loggedIn]);
@@ -44,8 +35,10 @@ export default function Home(props) {
     console.log('logging user in with this data: ', userData)
     setUsername(userData.username);
     setLoggedIn(true);
-    showLoginDropdown(false);
+    setLoginDropdown(false);
+    setLoginRoute('/blank');
     setLoginMessage('');
+    setLoginError('');
   };
 
   // LOG OUT
@@ -63,7 +56,7 @@ export default function Home(props) {
 
   // X OUT
   function xOut() {
-    showLoginDropdown(false);
+    setLoginDropdown(false);
     setLoginMessage('');
   };
 
@@ -81,7 +74,7 @@ export default function Home(props) {
         logout={logout}
         setRoute={redirect} 
         username ={username}
-        showLoginDropdown={showLoginDropdown}
+        setLoginDropdown={setLoginDropdown}
         setMessage={setLoginMessage}
       />
 
@@ -95,6 +88,8 @@ export default function Home(props) {
           error={loginError} setError={setLoginError}
           xOut={xOut}
           login={login}
+          resendEmailLink={resendEmailLink}
+          displayResendEmailLink={displayResendEmailLink}
         />
       }
     </div>
@@ -105,26 +100,79 @@ export default function Home(props) {
  * Fetch all SSR (user specific) props and passes them to the above component
  */
 
-const URL = process.env.DEV_ROUTE;
+const DEV_ROUTE = process.env.DEV_ROUTE;
 
 export async function getServerSideProps(context) {
 
-/* Checks if user is logged in. If so, it populates the page with user data */
+  console.log('getting server side props');
 
-    const res = await fetch(`${URL}/api/user/home`);
-    const data = await res.json();
+  /* Check for cookies */
+  const cooks = cookies(context);
 
-    return (data.username === undefined)
-      ? {
-          props: {
-            loggedIn: false,
-            username: '',
+  if (cooks.authenticated) { // exists after you authenticate email
+    console.log('rendering authenticated cookie')
+    const username = decodeURIComponent(cooks.authenticated.split('XXX')[1]); // make this better
+    return { props: {
+      renderFromCookie: true,
+      loggedIn: false,
+      loginRoute: '/login',
+      loginDropdown: true,
+      username: username,
+      loginMessage: 'Email verified. Please enter your password.'
+    }};
+  }
+
+  else if (cooks.reset_password) { // exists after you reset password
+    console.log('rendering reset_password cookie')
+    const email = decodeURIComponent(document.cookie.split('XXX')[1]);
+    return { props: {
+      renderFromCookie: true,
+      loggedIn: false,
+      username: '',
+      loginRoute: '/resetPassword',
+      loginDropdown: true,
+      email: email,
+      loginMessage: `Please enter a new password for ${email}.`
+    }};
+  }
+  /* If no access token, return no data */
+  else if (!cooks.access_token) { 
+    console.log('no access token')
+    return {
+      props: {
+        loggedIn: false,
+        username: '',
+        renderFromCookie: false,
+      }
+    }
+  }
+
+  /* Check if access_token is valid. If so, it populates the page with user data */
+  console.log('found access token')
+
+  const payload = { access_token: cooks.access_token };
+  return axios.post(`${DEV_ROUTE}/api/user/home`, payload)
+    .then(res => {
+      return (res.data.loggedIn)
+        ? {
+            props: {
+              loggedIn: true,
+              username: res.data.username,
+              renderFromCookie: false,
+            }
           }
-        }
-      : {
-          props: { 
-            loggedIn: true,
-            username: data.username,
+        : {
+            props: { 
+              loggedIn: false,
+              username: '',
+              renderFromCookie: false,
+            }
           }
-        }
-  };
+      
+    })
+    .catch(err => {
+      console.log('something went wrong while verifying access token', err);
+      return {};
+    })
+
+};

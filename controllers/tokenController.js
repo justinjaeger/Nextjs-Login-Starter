@@ -34,6 +34,8 @@ tokenController.createAccessToken = async (req, res, payload) => {
   cookies.set('authenticated'); // deletes cookie if there is one
   cookies.set('reset_password');
   cookies.set('access_token', access_token, { httpOnly: true });
+
+  console.log('should see access token', access_token)
   
   return {};
 };
@@ -42,7 +44,7 @@ tokenController.createAccessToken = async (req, res, payload) => {
 
 tokenController.deleteAccessToken = async (req, res, payload) => {
 
-  const { access_token } = payload;
+  const { access_token, user_id } = payload;
 
    /* Delete the access token in browser */
    const cookies = new Cookies(req, res);
@@ -89,13 +91,9 @@ tokenController.deleteAllUserTokens = async (req, res, payload) => {
 
 /*************************************/
 
-tokenController.verifyToken = async (req, res) => {
+tokenController.verifyToken = async (req, res, payload) => {
 
-  /* Check that the access_token exists */
-  if (req.cookies.access_token === undefined) return { end: { loggedIn: false } };
-
-  /* Get the access_token string */
-  const access_token = req.cookies.access_token;
+  const { access_token } = payload;
 
   /* Get the expiration and user_id from the token */
   result = await jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET, {ignoreExpiration: true});
@@ -109,7 +107,7 @@ tokenController.verifyToken = async (req, res) => {
   if (currentTime - expiration > 0) {
 
     /* DELETE ACCESS TOKEN */
-    payload = { access_token };
+    payload = { access_token, user_id };
     result = await tokenController.deleteAccessToken(req, res, payload);
     if (result.end) return result;
 

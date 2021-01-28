@@ -14,17 +14,26 @@ export default async function login(req, res) {
   /* Validate email and username */
   payload = { email, username };
   result = await signupController.validateEmailAndUsername(req, res, payload);
-  if (result.end) return res.json(result.end);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
 
   /* Validate password */
   payload = { password, confirmPassword };
   result = await signupController.validatePassword(req, res, payload);
-  if (result.end) return res.json(result.end);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
 
   /* Hash password */
   payload = { password };
   result = await signupController.hashPassword(req, res, payload);
-  if (result.end) return res.json(result.end);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
 
   const { hashedPassword } = result;
 
@@ -33,12 +42,18 @@ export default async function login(req, res) {
   /* Create user */
   payload = { email, username, password: hashedPassword };
   result = await signupController.createUser(req, res, payload);
-  if (result.end) return res.json(result.end);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
 
   /* Send Verification Email */
   payload = { email, username };
   result = await emailController.sendVerificationEmail(req, res, payload);
-  if (result.end) return res.json(result.end);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
 
   return res.json({
     message: `Please verify the email sent to ${email}.`

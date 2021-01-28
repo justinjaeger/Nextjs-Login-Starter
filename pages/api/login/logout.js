@@ -12,7 +12,10 @@ export default async function logout(req, res) {
   /* Delete access token */
   payload = { access_token };
   result = await tokenController.deleteAccessToken(req, res, payload);
-  if (result.end) return res.json(result.end);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
 
   return res.json({});
 };

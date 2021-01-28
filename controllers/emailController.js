@@ -11,10 +11,10 @@ emailController.sendVerificationEmail = (req, res, payload) => {
   const { email, username } = payload;
 
   /* Create the URL that takes the user to reset password page */
-  const PORT = 3000;
+  const DEV_ROUTE = process.env.DEV_ROUTE;
   const encryptedUsername = encrypt(username); // encrypts username so we can safetly use it in url
   const encodedUsername = encodeURIComponent(encryptedUsername); // encodes it because encryption will put weird characters in that will otherwise mess up the route
-  const url = `http://localhost:${PORT}/api/signup/verifyEmail/?username=${encodedUsername}`;
+  const url = `${DEV_ROUTE}/api/signup/verifyEmail/?username=${encodedUsername}`;
 
   /* utilizes the helper function */
   const { transport, emailVerificationOptions } = mailHelper(email, url, username);
@@ -33,10 +33,10 @@ emailController.sendResetPasswordEmail = (req, res, payload) => {
   const { email } = payload;
 
   /* Create the URL that takes the user to reset password page */
-  const PORT = 3000;
+  const DEV_ROUTE = process.env.DEV_ROUTE;
   const encryptedEmail = encrypt(email); // encrypts username so we can safetly use it in url
   const encodedEmail = encodeURIComponent(encryptedEmail); // encodes it because encryption will put weird characters in that will otherwise mess up the route
-  const url = `http://localhost:${PORT}/api/login/servePassResetPage/?email=${encodedEmail}`;
+  const url = `${DEV_ROUTE}/api/login/servePassResetPage/?email=${encodedEmail}`;
 
   /* utilizes the mail helper function */
   const { transport, passwordResetOptions } = mailHelper(email, url);

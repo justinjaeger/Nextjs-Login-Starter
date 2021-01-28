@@ -1,5 +1,4 @@
 import db from 'lib/db';
-
 import tokenController from 'controllers/tokenController';
 
 /**
@@ -11,19 +10,28 @@ import tokenController from 'controllers/tokenController';
  * Then, fetch the specific data you want based on the slug
  */
 
-let query, result;
+let query, result, payload;
 
 export default async function handler(req, res) {
+
+  const { access_token } = req.body;
 
   const { method } = req; // POST, GET, etc...
   const action = req.query.slug[0];
 
   /* Get the user_id from the access_token, if exists */
-  result = await tokenController.verifyToken(req, res);
-  if (result.end) return res.json(result.end);
+  payload = { access_token }
+  result = await tokenController.verifyToken(req, res, payload);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
+  
   if (result.loggedIn === undefined) return res.json({ loggedIn: false });
 
   const { user_id } = result;
+
+  console.log('should see user_id', user_id)
 
   /* Create data object to push other data to */
   const data = { user_id, loggedIn: true }
@@ -35,7 +43,11 @@ export default async function handler(req, res) {
         SELECT username FROM users WHERE user_id=${user_id}
       `;
       result = await db.query(query);
-      if (result.error) return res.json(result.error);
+      if (result.end) {
+        console.log('end: ', result.end)
+        return res.json(result.end);
+      };
+      
       data.username = result[0].username;
 
       break;
@@ -43,5 +55,6 @@ export default async function handler(req, res) {
       console.log('idk what you sent')
   };
 
+  console.log('returning this data:', data)
   return res.json(data)
 };

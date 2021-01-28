@@ -28,6 +28,7 @@
 #header-message {
   @include centerText();
   @include headerContent();
+  color: $off-white;
   font-size: 14px;
 }
 

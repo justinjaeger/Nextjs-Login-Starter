@@ -16,11 +16,10 @@ const LoginContainer = (props) => {
     email,
     message, setMessage,
     error, setError,
+    resendEmailLink, displayResendEmailLink,
     xOut,
     login
   } = props;
-
-  const [resendEmailLink, displayResendEmailLink] = useState(false);
 
   // RESEND VERIFICATION EMAIL
   function sendVerificationEmail(email, username) {
