@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
+    "cookie": "^0.4.1",
     "cookies": "^0.8.0",
     "crypto-js": "^4.0.0",
     "dotenv": "^8.2.0",

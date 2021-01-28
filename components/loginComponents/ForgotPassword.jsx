@@ -19,8 +19,8 @@ function ForgotPassword(props) {
     axios.post('/api/login/sendPassResetEmail', payload)
       .then(res => {
         if (res.data.error) return setError(res.data.error);
-        setMessage(res.data.message);
         setRoute('/blank');
+        setMessage(res.data.message);
       })
       .catch(err => {
         console.log('err', err.response);

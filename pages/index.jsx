@@ -8,25 +8,16 @@ import LoginContainer from 'containers/LoginContainer';
 export default function Home(props) { 
 
   const [loggedIn, setLoggedIn] = useState(props.loggedIn);
-  const [loginDropdown, setLoginDropdown] = useState(false);
-  const [loginRoute, setLoginRoute] = useState('/');
-  const [loginMessage, setLoginMessage] = useState('');
-  const [loginError, setLoginError] = useState('');
+  const [loginDropdown, setLoginDropdown] = useState(props.loginDropdown);
+  const [loginRoute, setLoginRoute] = useState(props.loginRoute);
+  const [loginMessage, setLoginMessage] = useState(props.loginMessage);
+  const [loginError, setLoginError] = useState(props.loginError);
   const [username, setUsername] = useState(props.username);
-  const [email, setEmail] = useState(''); 
-  const [resendEmailLink, displayResendEmailLink] = useState(false);
+  const [email, setEmail] = useState(props.email); 
+  const [resendEmailLink, displayResendEmailLink] = useState(props.resendEmailLink);
 
   useEffect(() => {
     console.log('useEffect firing');
-    console.log('props', props);
-
-    if (props.renderFromCookie) {
-      console.log('rendering from cookie')
-      if (props.loginRoute) setLoginRoute(props.loginRoute);
-      if (props.email) setLoginRoute(props.email);
-      if (props.loginDropdown) setLoginDropdown(props.loginDropdown);
-      if (props.loginMessage) setLoginMessage(props.loginMessage);
-    };
 
   }, [loggedIn]);
 
@@ -100,79 +91,62 @@ export default function Home(props) {
  * Fetch all SSR (user specific) props and passes them to the above component
  */
 
-const DEV_ROUTE = process.env.DEV_ROUTE;
-
 export async function getServerSideProps(context) {
 
   console.log('getting server side props');
+
+  /* Default values for all props */
+  const props = { 
+    loggedIn: false,
+    loginDropdown: false,
+    loginRoute: '/',
+    loginMessage: '',
+    loginError: '',
+    username: '',
+    email: '',
+    resendEmailLink: false,
+  };
 
   /* Check for cookies */
   const cooks = cookies(context);
 
   if (cooks.authenticated) { // exists after you authenticate email
     console.log('rendering authenticated cookie')
-    const username = decodeURIComponent(cooks.authenticated.split('XXX')[1]); // make this better
-    return { props: {
-      renderFromCookie: true,
-      loggedIn: false,
-      loginRoute: '/login',
-      loginDropdown: true,
-      username: username,
-      loginMessage: 'Email verified. Please enter your password.'
-    }};
-  }
+    const username = cooks.authenticated;
+    props.loginRoute = '/login';
+    props.loginDropdown = true;
+    props.username = username;
+    props.loginMessage = 'Email verified. Please enter your password.';
+  };
 
-  else if (cooks.reset_password) { // exists after you reset password
+  if (cooks.reset_password) { // exists after you reset password
     console.log('rendering reset_password cookie')
-    const email = decodeURIComponent(document.cookie.split('XXX')[1]);
-    return { props: {
-      renderFromCookie: true,
-      loggedIn: false,
-      username: '',
-      loginRoute: '/resetPassword',
-      loginDropdown: true,
-      email: email,
-      loginMessage: `Please enter a new password for ${email}.`
-    }};
-  }
-  /* If no access token, return no data */
-  else if (!cooks.access_token) { 
-    console.log('no access token')
-    return {
-      props: {
-        loggedIn: false,
-        username: '',
-        renderFromCookie: false,
-      }
-    }
-  }
+    const email = cooks.reset_password;
 
-  /* Check if access_token is valid. If so, it populates the page with user data */
-  console.log('found access token')
+    props.loginRoute = '/resetPassword';
+    props.loginDropdown = true;
+    props.email = email;
+    props.loginMessage = `Please enter a new password for ${email}.`;
+  };
 
-  const payload = { access_token: cooks.access_token };
-  return axios.post(`${DEV_ROUTE}/api/user/home`, payload)
-    .then(res => {
-      return (res.data.loggedIn)
-        ? {
-            props: {
-              loggedIn: true,
-              username: res.data.username,
-              renderFromCookie: false,
-            }
-          }
-        : {
-            props: { 
-              loggedIn: false,
-              username: '',
-              renderFromCookie: false,
-            }
-          }
-      
-    })
-    .catch(err => {
-      console.log('something went wrong while verifying access token', err);
-      return {};
-    })
+  if (cooks.access_token) { 
+    /* Check if access_token is valid. If so, it populates the page with user data */
+    const payload = { access_token: cooks.access_token };
+    return axios.post(`${process.env.DEV_ROUTE}/api/user/main`, payload)
+      .then(res => {
+        if (res.data.loggedIn) {
+          props.loggedIn = true;
+          props.username = res.data.username;
+          props.renderFromCookie = false;
+        };
+        return { props };
+      })
+      .catch(err => {
+        console.log('something went wrong while verifying access token', err);
+        return { props };
+      })
+  };
+
+  return { props };
 
 };

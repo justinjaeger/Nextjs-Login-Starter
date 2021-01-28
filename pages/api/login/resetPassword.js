@@ -19,7 +19,7 @@ export default async function resetPassword(req, res) {
     return res.json(result.end);
   };
 
-  const { username, email, user_id } = result;
+  const { username, user_id } = result;
 
   /* Validate Password - signup */
   payload = { password, confirmPassword };

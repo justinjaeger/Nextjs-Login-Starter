@@ -1,5 +1,7 @@
 import db from 'lib/db';
 import tokenController from 'controllers/tokenController';
+const jwt = require('jsonwebtoken');
+
 
 /**
  * Then if I want to fetch any data, I just do user / something
@@ -15,46 +17,45 @@ let query, result, payload;
 export default async function handler(req, res) {
 
   const { access_token } = req.body;
-
-  const { method } = req; // POST, GET, etc...
+  console.log('access_token in users/main', access_token)
+  
   const action = req.query.slug[0];
 
-  /* Get the user_id from the access_token, if exists */
-  payload = { access_token }
+  /* Verify the access_token */
+  payload = { access_token };
   result = await tokenController.verifyToken(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
     return res.json(result.end);
   };
   
-  if (result.loggedIn === undefined) return res.json({ loggedIn: false });
-
+  /* Get the user_id from above middleware */
   const { user_id } = result;
-
-  console.log('should see user_id', user_id)
 
   /* Create data object to push other data to */
   const data = { user_id, loggedIn: true }
 
+  /* All the below functions fetch some user data with the user_id */
   switch (action) {
-    case 'home':
-      /* fetch username */
+
+    /* Fetches the username */
+    case 'main':
       query = `
-        SELECT username FROM users WHERE user_id=${user_id}
+        SELECT username 
+        FROM users 
+        WHERE user_id=${user_id}
       `;
       result = await db.query(query);
       if (result.end) {
-        console.log('end: ', result.end)
+        console.log('end main: ', result.end)
         return res.json(result.end);
       };
-      
       data.username = result[0].username;
-
       break;
-    default:
-      console.log('idk what you sent')
   };
 
   console.log('returning this data:', data)
   return res.json(data)
+  
 };
+

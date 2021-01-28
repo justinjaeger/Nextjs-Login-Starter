@@ -23,7 +23,7 @@ export default async function verifyEmail(req, res) {
   /* set a cookie in the browser so it loads the re-enter password screen */
   const cookies = new Cookies(req, res);
   cookies.set('reset_password'); // clears it
-  cookies.set('authenticated', `XXX${decryptedUsername}XXX`);
+  cookies.set('authenticated', decryptedUsername);
 
   /* Authenticate user in db */
   payload = { username: decryptedUsername };

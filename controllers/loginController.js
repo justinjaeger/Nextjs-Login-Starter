@@ -97,7 +97,7 @@ loginController.updatePassword = async (req, res, payload) => {
   /* Update the password in db */
   query = `
     UPDATE users
-    SET password=${hashedPassword}
+    SET password="${hashedPassword}"
     WHERE user_id=${user_id}
   `;
   result = await db.query(query);

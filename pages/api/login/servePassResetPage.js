@@ -19,7 +19,7 @@ export default async function serveResetPassPage(req, res) {
   /* set a cookie in the browser so it loads the reset password screen */
   const cookies = new Cookies(req, res);
   cookies.set('authenticated'); // clears it
-  cookies.set('reset_password', `XXX${decryptedEmail}XXX`);
+  cookies.set('reset_password', decryptedEmail);
 
   /* Has to redirect to main page */
   /* The main page should see the new cookie and proceed accordingly */

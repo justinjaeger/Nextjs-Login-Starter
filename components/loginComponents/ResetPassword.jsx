@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 
-function SignUp(props) {
+function ResetPassword(props) {
 
   const { setMessage, setError, email, login } = props;
   const [password, setPassword] = useState("");
@@ -12,15 +12,11 @@ function SignUp(props) {
   };
 
   function handleSubmit(event) {
-
     const payload = {
-      emailOrUsername: email,
+      email,
       password,
       confirmPassword
     };
-
-    console.log('submitted', payload);
-
     axios.post('/api/login/resetPassword', payload)
       .then(res => {
         if (res.data.error) return setError(res.data.error);
@@ -61,4 +57,4 @@ function SignUp(props) {
   );
 };
 
-export default SignUp;
+export default ResetPassword;
