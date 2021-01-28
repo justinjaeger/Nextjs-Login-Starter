@@ -1,7 +1,12 @@
 import db from 'lib/db';
 import tokenController from 'controllers/tokenController';
 const jwt = require('jsonwebtoken');
+const Cookies = require('cookies');
+import axios from 'axios';
 
+// const Cookies = require('js-cookie');
+
+// var cookie = require('cookie');
 
 /**
  * Then if I want to fetch any data, I just do user / something
@@ -15,6 +20,11 @@ const jwt = require('jsonwebtoken');
 let query, result, payload;
 
 export default async function handler(req, res) {
+
+  /* MAKE A COOKIE */
+  payload = { key: 'key', value: 'value', method: 'create' };
+  result = await axios.get(`${process.env.DEV_ROUTE}/api/cookies`, payload)
+  console.log('result', result.data)
 
   const { access_token } = req.body;
   console.log('access_token in users/main', access_token)
