@@ -38,8 +38,8 @@ async function migrate() {
       admin BIT(1) DEFAULT 0,
       authenticated BIT(1) DEFAULT 0,
       image VARCHAR(10000),
-      dateCreated DATE,
-      lastLoggedIn DATE
+      dateCreated DATETIME,
+      lastLoggedIn DATETIME
     )
 
     CREATE TABLE IF NOT EXISTS tokens (

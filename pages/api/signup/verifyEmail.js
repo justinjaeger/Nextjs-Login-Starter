@@ -27,13 +27,11 @@ export default async function verifyEmail(req, res) {
 
   /* Authenticate user in db */
   payload = { username: decryptedUsername };
-  console.log('should be authenticating user here')
   result = await signupController.authenticateUser(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
     return res.json(result.end);
   };
-  console.log('should have just done it')
 
   /* Has to redirect to main page */
   /* The main page should see the new cookie and proceed accordingly */

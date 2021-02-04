@@ -5,7 +5,7 @@ import signupController from 'controllers/signupController';
 /**
  * When the user clicks 'Sign Up'
  */
- 
+
 let result, payload;
 export default async function login(req, res) {
 
@@ -37,8 +37,6 @@ export default async function login(req, res) {
 
   const { hashedPassword } = result;
 
-  console.log('hashed password', hashedPassword)
-
   /* Create user */
   payload = { email, username, password: hashedPassword };
   result = await signupController.createUser(req, res, payload);
@@ -50,6 +48,14 @@ export default async function login(req, res) {
   /* Send Verification Email */
   payload = { email, username };
   result = await emailController.sendVerificationEmail(req, res, payload);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
+
+  /* Mark the DateCreated field */
+  payload = { username };
+  result = await signupController.markDateCreated(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
     return res.json(result.end);

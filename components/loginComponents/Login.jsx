@@ -3,7 +3,7 @@ import axios from 'axios';
 
 function Login(props) {
 
-  const { login, setMessage, setError, username, setRoute, displayResendEmailLink } = props;
+  const { login, setMessage, setError, username, setRoute, setResendEmailLink } = props;
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -31,7 +31,7 @@ function Login(props) {
         /* If email is in the body, it means user is not authenticated */
         if (res.data.email) {
           console.log('not authenticated...')
-          displayResendEmailLink({ email: res.data.email, username: res.data.username });
+          setResendEmailLink({ email: res.data.email, username: res.data.username });
           setRoute('/blank');
           setMessage(res.data.message);
           return;

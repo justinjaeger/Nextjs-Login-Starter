@@ -82,6 +82,7 @@ signupController.createUser = async (req, res, payload) => {
     INSERT INTO users(email, username, password)
     VALUES("${email}", "${username}", "${password}")
   `;
+
   result = await db.query(query); 
   if (result.error) {
     /* Handle duplicate entry errors with an error message */
@@ -134,6 +135,28 @@ signupController.getUserIdByUsername = async (req, res, payload) => {
   const { user_id } = result[0];
   
   return { user_id }
+};
+
+/*************************************/
+
+signupController.markDateCreated = async (req, res, payload) => {
+
+  const { username } = payload;
+
+  /* get the datetime */
+  const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+  /* update the "dateCreated" field with current datetime */
+  query = `
+    UPDATE users
+    SET dateCreated = '${datetime}'
+    WHERE username = '${username}'
+  `;
+
+  result = await db.query(query); 
+  if (result.error) return { end: result.error };
+
+  return {};
 };
 
 /*************************************/

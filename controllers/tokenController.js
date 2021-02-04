@@ -80,7 +80,17 @@ tokenController.createAccessToken = async (req, res, payload) => {
   /* SET COOKIE IN BROWSER */
   cookies.set('access_token', access_token, { httpOnly: true });
 
-  console.log('should have just set a new cookie in browser')
+  console.log('should have just set a new cookie in browser');
+
+  /* UPDATE LAST LOGGED IN */
+  const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  query = `
+    UPDATE users
+    SET lastLoggedIn = '${datetime}'
+    WHERE user_id = ${user_id}
+  `;
+  result = await db.query(query);
+  if (result.error) return { end: result.error };
   
   return { access_token };
 };

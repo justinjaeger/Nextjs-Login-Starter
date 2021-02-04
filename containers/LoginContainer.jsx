@@ -16,7 +16,7 @@ const LoginContainer = (props) => {
     email,
     message, setMessage,
     error, setError,
-    resendEmailLink, displayResendEmailLink,
+    resendEmailLink, setResendEmailLink,
     xOut,
     login
   } = props;
@@ -29,7 +29,7 @@ const LoginContainer = (props) => {
       if (res.data.error) return setError(res.data.error);
       setRoute('/blank');
       setMessage(res.data.message);
-      displayResendEmailLink(false);
+      setResendEmailLink(false);
     })
     .catch(err => {
       console.log('err, could not resend verification email', err.response);
@@ -52,7 +52,7 @@ const LoginContainer = (props) => {
           login={login}
           setMessage={setMessage}
           setError={setError}
-          displayResendEmailLink={displayResendEmailLink}
+          setResendEmailLink={setResendEmailLink}
         />
       }
 
@@ -61,7 +61,7 @@ const LoginContainer = (props) => {
           setRoute={setRoute}
           setMessage={setMessage}
           setError={setError}
-          displayResendEmailLink={displayResendEmailLink}
+          setResendEmailLink={setResendEmailLink}
         />
       }
 

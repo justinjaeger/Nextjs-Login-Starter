@@ -12,12 +12,7 @@ export default function App(props) {
   const [loginError, setLoginError] = useState(props.loginError);
   const [username, setUsername] = useState(props.username);
   const [email, setEmail] = useState(props.email); 
-  const [resendEmailLink, displayResendEmailLink] = useState(props.resendEmailLink);
-
-  useEffect(() => {
-    console.log('useEffect firing');
-
-  }, [loggedIn]);
+  const [resendEmailLink, setResendEmailLink] = useState(props.resendEmailLink);
 
   // LOG IN
   function login(userData) {
@@ -54,6 +49,7 @@ export default function App(props) {
     setLoginRoute(entry);
     setLoginError('');
     setLoginMessage('');
+    setResendEmailLink(false);
   };
 
   return (
@@ -78,7 +74,7 @@ export default function App(props) {
           xOut={xOut}
           login={login}
           resendEmailLink={resendEmailLink}
-          displayResendEmailLink={displayResendEmailLink}
+          setResendEmailLink={setResendEmailLink}
         />
       }
     </div>
