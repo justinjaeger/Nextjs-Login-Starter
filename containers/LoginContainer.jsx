@@ -13,7 +13,7 @@ const LoginContainer = (props) => {
   const { 
     route, setRoute, 
     username, setUsername,
-    email,
+    email, setEmail,
     message, setMessage,
     error, setError,
     resendEmailLink, setResendEmailLink,
@@ -22,7 +22,7 @@ const LoginContainer = (props) => {
     xOut,
     login,
     setLoginDropdown,
-    notification, setNotification
+    notification, setNotification, setNotificationBox
   } = props;
 
   // RESEND VERIFICATION EMAIL
@@ -77,6 +77,8 @@ const LoginContainer = (props) => {
       { (route === '/signup') &&
         <SignUp 
           username={username}
+          actualSetEmail={setEmail}
+          actualSetUsername={setUsername}
           setRoute={setRoute}
           setMessage={setMessage}
           setError={setError}
@@ -84,6 +86,7 @@ const LoginContainer = (props) => {
           setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
           setLoginDropdown={setLoginDropdown}
           setNotification={setNotification}
+          setNotificationBox={setNotificationBox}
         />
       }
 

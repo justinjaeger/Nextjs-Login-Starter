@@ -3,11 +3,21 @@ import axios from 'axios';
 
 function SignUp(props) {
 
-  const { setNotification, setRoute, setLoginDropdown, setError } = props;
+  const { 
+    actualSetEmail, actualSetUsername,
+    setNotification, 
+    setRoute, 
+    setLoginDropdown, 
+    setError, 
+    setNotificationBox 
+  } = props;
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState(props.username);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  console.log('username in signup', username)
 
   function validateForm() {
     return email.length > 0 && password.length > 0;
@@ -21,14 +31,19 @@ function SignUp(props) {
       password,
       confirmPassword
     };
+    
+    console.log('submitting payload', payload)
 
     /* NOTE: The /signup POST request will send the user a verification email, so it won't return anything back except a message */
     axios.post('/api/signup', payload)
       .then(res => {
-        console.log('message?', res.data)
-        if (res.data.error) return setError(res.data.error);       
-        setRoute('/blank');
+        if (res.data.error) return setError(res.data.error);   
+        console.log('signup suvvsssful') 
+        actualSetEmail(email);   
+        actualSetUsername(username);
+        // setRoute('/blank');
         setNotification('please verify email');
+        setNotificationBox(true);
         setLoginDropdown(false);
       })
       .catch(err => {

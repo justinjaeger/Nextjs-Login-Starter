@@ -10,13 +10,15 @@ let result, payload;
 export default async function login(req, res) {
 
   const { email } = req.body;
+
+  console.log('email in deleteUser.js', email)
   
   /* Delete User */
   payload = { email };
   result = await signupController.deleteUser(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Clear Cookie */

@@ -3,6 +3,7 @@ import axios from 'axios';
 import Header from 'containers/Header';
 import LoginContainer from 'containers/LoginContainer';
 import Notification from 'components/Notification';
+import { motion } from "framer-motion"
 
 export default function App(props) { 
 
@@ -16,7 +17,8 @@ export default function App(props) {
   const [resendEmailLink, setResendEmailLink] = useState(false);
   const [reEnterEmailForPasswordReset, setReEnterEmailForPasswordReset] = useState(false);
   const [reEnterEmailForSignup, setReEnterEmailForSignup] = useState(false);
-  const [notification, setNotification] = useState('props.notification');
+  const [notification, setNotification] = useState(props.notification);
+  const [notificationBox, setNotificationBox] = useState(props.notificationBox);
 
   // LOG IN
   function login(userData) {
@@ -62,15 +64,15 @@ export default function App(props) {
   return (
     <div id="App">
 
-      { notification && 
-        <Notification 
-          setRoute={redirect}
-          notification={notification}
-          email={email}
-          username={username}
-          setNotification={setNotification}
-        />
-      }
+      <Notification 
+        setRoute={redirect}
+        email={email}
+        username={username} setUsername={setUsername}
+        setLoginDropdown={setLoginDropdown}
+        setMessage={setLoginMessage}
+        notification={notification} setNotification={setNotification}
+        notificationBox={notificationBox} setNotificationBox={setNotificationBox}
+      />
 
       <Header
         loggedIn={loggedIn}
@@ -81,7 +83,7 @@ export default function App(props) {
         setMessage={setLoginMessage}
       />
 
-      { (loginDropdown===true) && 
+      { loginDropdown && 
         <LoginContainer
           loggedIn={loggedIn} setLoggedIn={setLoggedIn}
           route={loginRoute} setRoute={redirect}
@@ -99,6 +101,7 @@ export default function App(props) {
           setReEnterEmailForSignup={setReEnterEmailForSignup}
           setLoginDropdown={setLoginDropdown}
           notification={notification} setNotification={setNotification}
+          setNotificationBox={setNotificationBox}
         />
       }
 
