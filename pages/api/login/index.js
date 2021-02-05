@@ -20,7 +20,7 @@ export default async function login(req, res) {
   result = await loginController.returnUserData(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json({ error: result.end });
+    return res.json(result.end);
   };
   
   const { username, email, user_id, dbPassword, authenticated } = result;
@@ -30,7 +30,7 @@ export default async function login(req, res) {
   result = await loginController.verifyPassword(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json({ error: result.end });
+    return res.json(result.end);
   };
 
   /* Verify Email Authentication */
@@ -48,7 +48,7 @@ export default async function login(req, res) {
   result = await tokenController.createAccessToken(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json({ error: result.end });
+    return res.json(result.end);
   };
 
   /* Clear cookies */

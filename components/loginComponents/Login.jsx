@@ -3,7 +3,13 @@ import axios from 'axios';
 
 function Login(props) {
 
-  const { login, setMessage, setError, setRoute, setResendEmailLink, setReEnterEmailForPasswordReset } = props;
+  const { 
+    login, 
+    setMessage, 
+    setError, setRoute, 
+    setResendEmailLink,
+  } = props;
+  
   const [emailOrUsername, setEmailOrUsername] = useState(props.username);
   const [password, setPassword] = useState("");
 

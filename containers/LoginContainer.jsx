@@ -17,12 +17,12 @@ const LoginContainer = (props) => {
     message, setMessage,
     error, setError,
     resendEmailLink, setResendEmailLink,
-    reEnterEmailForPasswordReset, setReEnterEmailForPasswordReset,
-    reEnterEmailForSignup, setReEnterEmailForSignup,
+    reEnterEmailLink, setReEnterEmailLink,
+    changeEmailLink, setChangeEmailLink,
     xOut,
     login,
     setLoginDropdown,
-    notification, setNotification, setNotificationBox
+    setNotification, setNotificationBox
   } = props;
 
   // RESEND VERIFICATION EMAIL
@@ -34,7 +34,7 @@ const LoginContainer = (props) => {
       setRoute('/blank');
       setMessage(res.data.message);
       setResendEmailLink(false);
-      // setReEnterEmailForPasswordReset(true);
+      // setReEnterEmailLink(true);
     })
     .catch(err => {
       console.log('err, could not resend verification email', err.response);
@@ -44,14 +44,15 @@ const LoginContainer = (props) => {
   // TAKE USER TO RESET PASSWORD SCREEN
   function loadPasswordReset() {
     setRoute('/forgotPassword');
-    setReEnterEmailForPasswordReset(false);
+    setReEnterEmailLink(false);
   };
 
   // TAKE USER TO SIGNUP SCREEN
   function loadSignup() {
     setRoute('/signup');
-    setReEnterEmailForSignup(false);
+    setChangeEmailLink(false);
   };
+  
 
   // =============================== //
   
@@ -70,7 +71,7 @@ const LoginContainer = (props) => {
           setMessage={setMessage}
           setError={setError}
           setResendEmailLink={setResendEmailLink}
-          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
+          setReEnterEmailLink={setReEnterEmailLink}
         />
       }
 
@@ -83,7 +84,7 @@ const LoginContainer = (props) => {
           setMessage={setMessage}
           setError={setError}
           setResendEmailLink={setResendEmailLink}
-          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
+          setReEnterEmailLink={setReEnterEmailLink}
           setLoginDropdown={setLoginDropdown}
           setNotification={setNotification}
           setNotificationBox={setNotificationBox}
@@ -95,7 +96,7 @@ const LoginContainer = (props) => {
           setRoute={setRoute}
           setMessage={setMessage}
           setError={setError}
-          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
+          setReEnterEmailLink={setReEnterEmailLink}
         />
       }
 
@@ -124,7 +125,7 @@ const LoginContainer = (props) => {
           </button> to resend email
         </div> }
 
-      { reEnterEmailForPasswordReset && 
+      { reEnterEmailLink && 
         <div className="login-message">
           <button 
             onClick={() => {loadPasswordReset()}} 
@@ -133,7 +134,7 @@ const LoginContainer = (props) => {
           </button>
         </div> }
 
-      { reEnterEmailForSignup && 
+      { changeEmailLink && 
         <div className="login-message">
           <button 
             onClick={() => {loadSignup()}} 

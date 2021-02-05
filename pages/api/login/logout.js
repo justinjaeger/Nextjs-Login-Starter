@@ -15,7 +15,7 @@ export default async function logout(req, res) {
   result = await jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET, {ignoreExpiration: true});
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json({ error: result.end });
+    return res.json(result.end);
   };
   const { user_id } = result
   
@@ -24,7 +24,7 @@ export default async function logout(req, res) {
   result = await tokenController.deleteAccessToken(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json({ error: result.end });
+    return res.json(result.end);
   };
 
   return res.json({});

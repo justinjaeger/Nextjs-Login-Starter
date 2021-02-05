@@ -14,7 +14,7 @@ export default async function resendVerification(req, res) {
   result = await emailController.sendVerificationEmail(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json({ error: result.end });
+    return res.json(result.end);
   };
 
   return res.json({

@@ -6,7 +6,6 @@ function SignUp(props) {
   const { 
     actualSetEmail, actualSetUsername,
     setNotification, 
-    setRoute, 
     setLoginDropdown, 
     setError, 
     setNotificationBox 
@@ -41,7 +40,6 @@ function SignUp(props) {
         console.log('signup suvvsssful') 
         actualSetEmail(email);   
         actualSetUsername(username);
-        // setRoute('/blank');
         setNotification('please verify email');
         setNotificationBox(true);
         setLoginDropdown(false);
