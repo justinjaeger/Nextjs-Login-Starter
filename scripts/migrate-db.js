@@ -33,7 +33,7 @@ async function migrate() {
     CREATE TABLE IF NOT EXISTS users (
       user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       email VARCHAR(100) NOT NULL UNIQUE,
-      username VARCHAR(30) NOT NULL UNIQUE,
+      username VARCHAR(20) NOT NULL UNIQUE,
       password VARCHAR(100) NOT NULL,
       admin BIT(1) DEFAULT 0,
       authenticated BIT(1) DEFAULT 0,

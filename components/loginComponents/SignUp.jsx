@@ -3,9 +3,9 @@ import axios from 'axios';
 
 function SignUp(props) {
 
-  const { setMessage, setRoute, setError, setResendEmailLink } = props;
+  const { setNotification, setRoute, setLoginDropdown, setError } = props;
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(props.username);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -28,8 +28,8 @@ function SignUp(props) {
         console.log('message?', res.data)
         if (res.data.error) return setError(res.data.error);       
         setRoute('/blank');
-        setResendEmailLink({ email, username });
-        setMessage(res.data.message); 
+        setNotification('please verify email');
+        setLoginDropdown(false);
       })
       .catch(err => {
         console.log('error in signup', err.response);

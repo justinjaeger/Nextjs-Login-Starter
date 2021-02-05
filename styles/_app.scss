@@ -12,7 +12,6 @@
     outline: $secondary;
   }
   input:focus {
-    // outline-color: $gray;
     outline: none;
   }
   button:hover {
@@ -23,5 +22,3 @@
 body {
   background: $off-white;
 }
-
-#App {}

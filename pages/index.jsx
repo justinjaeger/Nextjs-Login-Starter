@@ -16,7 +16,7 @@ export default function Home(props) {
         loginError={props.loginError}
         username={props.username}
         email={props.email}
-        resendEmailLink={props.resendEmailLink}
+        notification={props.notification}
       />
     </>
   );
@@ -42,12 +42,20 @@ export async function getServerSideProps(context) {
     loginError: '',
     username: '',
     email: '',
-    resendEmailLink: false,
+    notification: false,
   };
 
-  /* Check for cookies */
+  /* Handle cookies */
 
   const c = cookies(context); // for getting cookies
+
+  if (c.sent_verification) { // cookie exists after you sign up but NOT after you authenticate email
+    const username = c.sent_verification.split('*$%&')[0]
+    const email = c.sent_verification.split('*$%&')[1]
+    props.email = email;
+    props.username = username;
+    props.notification = 'please verify email';
+  };
 
   if (c.authenticated) { // cookie exists after you authenticate email
     const username = c.authenticated;

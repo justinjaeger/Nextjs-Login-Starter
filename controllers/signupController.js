@@ -22,6 +22,10 @@ signupController.validateEmailAndUsername = (req, res, next) => {
     return { end: { error : 'this email is not properly formatted' } };
   };
 
+  if (username.length > 20) {
+    return { end: { error : 'username cannot be more than 20 characters' } };
+  }
+
   const filterResult = usernameFilter(username);
   if (filterResult.status === false) {
     return { end: { error : filterResult.message } };
@@ -91,7 +95,8 @@ signupController.createUser = async (req, res, payload) => {
         ? { end: { error: 'This username is already registered.' } }
         : { end: { error: 'This email is already registered.' } }
     };
-    return { end: result.error };
+    console.log('error in createUser:', result.error);
+    return { end: { error: 'an error occured' } };
   };
 
   return {};
@@ -151,6 +156,24 @@ signupController.markDateCreated = async (req, res, payload) => {
     UPDATE users
     SET dateCreated = '${datetime}'
     WHERE username = '${username}'
+  `;
+
+  result = await db.query(query); 
+  if (result.error) return { end: result.error };
+
+  return {};
+};
+
+/*************************************/
+
+signupController.deleteUser = async (req, res, payload) => {
+
+  const { email } = payload;
+
+  /* delete the user from database */
+  query = `
+    DELETE FROM users
+    WHERE email = '${email}'
   `;
 
   result = await db.query(query); 

@@ -12,13 +12,17 @@ const LoginContainer = (props) => {
 
   const { 
     route, setRoute, 
-    username,
+    username, setUsername,
     email,
     message, setMessage,
     error, setError,
     resendEmailLink, setResendEmailLink,
+    reEnterEmailForPasswordReset, setReEnterEmailForPasswordReset,
+    reEnterEmailForSignup, setReEnterEmailForSignup,
     xOut,
-    login
+    login,
+    setLoginDropdown,
+    notification, setNotification
   } = props;
 
   // RESEND VERIFICATION EMAIL
@@ -30,10 +34,23 @@ const LoginContainer = (props) => {
       setRoute('/blank');
       setMessage(res.data.message);
       setResendEmailLink(false);
+      // setReEnterEmailForPasswordReset(true);
     })
     .catch(err => {
       console.log('err, could not resend verification email', err.response);
     })
+  };
+
+  // TAKE USER TO RESET PASSWORD SCREEN
+  function loadPasswordReset() {
+    setRoute('/forgotPassword');
+    setReEnterEmailForPasswordReset(false);
+  };
+
+  // TAKE USER TO SIGNUP SCREEN
+  function loadSignup() {
+    setRoute('/signup');
+    setReEnterEmailForSignup(false);
   };
 
   // =============================== //
@@ -53,15 +70,20 @@ const LoginContainer = (props) => {
           setMessage={setMessage}
           setError={setError}
           setResendEmailLink={setResendEmailLink}
+          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
         />
       }
 
       { (route === '/signup') &&
         <SignUp 
+          username={username}
           setRoute={setRoute}
           setMessage={setMessage}
           setError={setError}
           setResendEmailLink={setResendEmailLink}
+          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
+          setLoginDropdown={setLoginDropdown}
+          setNotification={setNotification}
         />
       }
 
@@ -70,6 +92,7 @@ const LoginContainer = (props) => {
           setRoute={setRoute}
           setMessage={setMessage}
           setError={setError}
+          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
         />
       }
 
@@ -84,13 +107,37 @@ const LoginContainer = (props) => {
       }
 
       { (route === '/blank') && 
-        <Blank 
-        />
+        <Blank />
       }
 
       { error && <div className="error-message">{error}</div>}
       
-      { resendEmailLink && <div className="login-message"><button onClick={() => {sendVerificationEmail(resendEmailLink.email, resendEmailLink.username)}} className="click-here-button" >Click here</button> to resend email</div> }
+      { resendEmailLink && 
+        <div className="login-message">
+          <button 
+            onClick={() => {sendVerificationEmail(resendEmailLink.email, resendEmailLink.username)}} 
+            className="click-here-button"
+            >Click here 
+          </button> to resend email
+        </div> }
+
+      { reEnterEmailForPasswordReset && 
+        <div className="login-message">
+          <button 
+            onClick={() => {loadPasswordReset()}} 
+            className="click-here-button" 
+            >Wrong email?
+          </button>
+        </div> }
+
+      { reEnterEmailForSignup && 
+        <div className="login-message">
+          <button 
+            onClick={() => {loadSignup()}} 
+            className="click-here-button" 
+            >Change email
+          </button>
+        </div> }
 
     </div>
   );  

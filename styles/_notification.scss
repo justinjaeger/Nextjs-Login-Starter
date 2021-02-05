@@ -1,0 +1,51 @@
+@import 'styles/variables';
+
+@mixin circleButton() {
+  border-radius: 50%;
+  height: 18px;
+  width: 18px;
+  line-height: 0px;
+}
+
+#notification {
+  position: fixed;
+  top: 10px;
+  left: 20px;
+  max-width: 600px;
+  color: $off-black;
+  background-color: $secondary;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+#notif-x-button {
+  position: fixed;
+  @include circleButton();
+  top: 5px;
+  left: 15px;
+  font-weight: 900;
+  line-height: 5px;
+  color: $off-black;
+  background: $off-white;
+  padding: 5px;
+  &:hover {
+    background: $off-black;
+    color: $off-white;
+  } 
+  margin-right: 6px;
+  // border: 1px solid $secondary;
+}
+
+#notif-click-here {
+  position: relative;
+  font-size: 16px;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.fuckass {
+  height: 1000px;
+  // background-color: blue;
+}

@@ -1,12 +1,14 @@
 import loginController from 'controllers/loginController';
 import emailController from 'controllers/emailController';
 import signupController from 'controllers/signupController';
+const Cookies = require('cookies');
 
 /**
  * When the user clicks 'Sign Up'
  */
 
 let result, payload;
+
 export default async function login(req, res) {
 
   const { email, username, password, confirmPassword } = req.body;
@@ -60,6 +62,10 @@ export default async function login(req, res) {
     console.log('end: ', result.end)
     return res.json(result.end);
   };
+
+  /* set a cookie called sent_verification with value email */
+  const cookies = new Cookies(req, res);
+  cookies.set('sent_verification', `${username}*$%&${email}`);
 
   return res.json({
     message: `Please verify the email sent to ${email}.`

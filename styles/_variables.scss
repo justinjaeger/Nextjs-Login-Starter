@@ -12,3 +12,24 @@ $primary: #A4031F;
 $primary-light: #FFC5C5;
 $secondary: #FFC60A;
 $secondary-light: #FFF6B6;
+
+// BREAKPOINTS
+$phone: 414px;
+$tablet: 768px;
+$desktop: 1024px;
+
+@mixin phone {
+  @media (max-width: $phone) {
+    @content;
+  }
+}
+@mixin tablet {
+  @media (max-width: $tablet) {
+    @content;
+  }
+}
+@mixin desktop {
+  @media (max-width: $desktop) {
+    @content;
+  }
+}

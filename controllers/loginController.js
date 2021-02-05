@@ -79,7 +79,7 @@ loginController.ifEmailNoExistDontSend = async (req, res, payload) => {
       But we should send the message anyway in case a hacker
       is fishing for valid emails */
     return { end: { 
-      message: `An email was sent to ${req.body.email}. Didn't receive email? Make sure address is correct.`,
+      message: `An email was sent to ${req.body.email}.`,
       route: '/blank',
     }};
   };

@@ -55,6 +55,7 @@ export default async function login(req, res) {
   const cookies = new Cookies(req, res);
   cookies.set('reset_password');
   cookies.set('authenticated');
+  cookies.set('sent_verification');
 
   /* Return data to client */ 
   return res.json({

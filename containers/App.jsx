@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from 'containers/Header';
 import LoginContainer from 'containers/LoginContainer';
+import Notification from 'components/Notification';
 
 export default function App(props) { 
 
@@ -11,8 +12,11 @@ export default function App(props) {
   const [loginMessage, setLoginMessage] = useState(props.loginMessage);
   const [loginError, setLoginError] = useState(props.loginError);
   const [username, setUsername] = useState(props.username);
-  const [email, setEmail] = useState(props.email); 
-  const [resendEmailLink, setResendEmailLink] = useState(props.resendEmailLink);
+  const [email, setEmail] = useState(props.email);
+  const [resendEmailLink, setResendEmailLink] = useState(false);
+  const [reEnterEmailForPasswordReset, setReEnterEmailForPasswordReset] = useState(false);
+  const [reEnterEmailForSignup, setReEnterEmailForSignup] = useState(false);
+  const [notification, setNotification] = useState('props.notification');
 
   // LOG IN
   function login(userData) {
@@ -50,10 +54,24 @@ export default function App(props) {
     setLoginError('');
     setLoginMessage('');
     setResendEmailLink(false);
+    setReEnterEmailForPasswordReset(false);
+    setReEnterEmailForSignup(false);
+    setLoginDropdown(true);
   };
 
   return (
     <div id="App">
+
+      { notification && 
+        <Notification 
+          setRoute={redirect}
+          notification={notification}
+          email={email}
+          username={username}
+          setNotification={setNotification}
+        />
+      }
+
       <Header
         loggedIn={loggedIn}
         logout={logout}
@@ -75,8 +93,16 @@ export default function App(props) {
           login={login}
           resendEmailLink={resendEmailLink}
           setResendEmailLink={setResendEmailLink}
+          reEnterEmailForPasswordReset={reEnterEmailForPasswordReset}
+          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
+          reEnterEmailForSignup={reEnterEmailForSignup}
+          setReEnterEmailForSignup={setReEnterEmailForSignup}
+          setLoginDropdown={setLoginDropdown}
+          notification={notification} setNotification={setNotification}
         />
       }
+
+      <div className="fuckass">big ass box</div>
     </div>
   );
 }
