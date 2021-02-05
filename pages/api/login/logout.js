@@ -13,7 +13,10 @@ export default async function logout(req, res) {
 
   /* Get the user_id from the token */
   result = await jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET, {ignoreExpiration: true});
-  if (result.error) return res.json(result.error);
+  if (result.end) {
+    console.log('end: ', result.end)
+    return res.json(result.end);
+  };
   const { user_id } = result
   
   /* Delete access token */

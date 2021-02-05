@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       result = await userController.getUsername(req, res, { user_id });
       if (result.end) {
         console.log('end: ', result.end)
-        return res.json(result.end);
+        return res.json({ error: result.end });
       };
       data.username = result.username;
   };

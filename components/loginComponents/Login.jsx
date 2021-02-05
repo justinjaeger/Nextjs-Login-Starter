@@ -3,13 +3,15 @@ import axios from 'axios';
 
 function Login(props) {
 
-  const { login, setMessage, setError, username, setRoute, setResendEmailLink, setReEnterEmailForPasswordReset } = props;
-  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const { 
+    login, 
+    setMessage, 
+    setError, setRoute, 
+    setResendEmailLink,
+  } = props;
+  
+  const [emailOrUsername, setEmailOrUsername] = useState(props.username);
   const [password, setPassword] = useState("");
-
-  useEffect(() => {
-    if (username) setEmailOrUsername(username);
-  });
 
   function validateForm() {
     return emailOrUsername.length > 0 && password.length > 0;
@@ -22,8 +24,6 @@ function Login(props) {
       password,
     };
 
-    console.log('submitted payload: ', payload);
-
     axios.post('/api/login', payload)
       .then(res => {
         if (res.data.error) return setError(res.data.error);
@@ -33,7 +33,6 @@ function Login(props) {
           console.log('not authenticated...')
           setRoute('/blank');
           setResendEmailLink({ email: res.data.email, username: res.data.username });
-          // setReEnterEmailForPasswordReset(true);
           setMessage(res.data.message); // "please verify the email sent to..."
           return;
         };

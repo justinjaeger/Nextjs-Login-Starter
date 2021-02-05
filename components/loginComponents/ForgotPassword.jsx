@@ -3,7 +3,8 @@ import axios from 'axios';
 
 function ForgotPassword(props) {
 
-  const { setMessage, setRoute, setError, setReEnterEmailForPasswordReset } = props;
+  const { setMessage, setRoute, setError, setReEnterEmailLink } = props;
+  
   const [email, setEmail] = useState("");
 
   function validateForm() {
@@ -20,7 +21,7 @@ function ForgotPassword(props) {
       .then(res => {
         if (res.data.error) return setError(res.data.error);
         setRoute('/blank');
-        setReEnterEmailForPasswordReset(true);
+        setReEnterEmailLink(true);
         setMessage(res.data.message);
       })
       .catch(err => {

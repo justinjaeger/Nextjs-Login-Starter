@@ -3,20 +3,24 @@ import axios from 'axios';
 import Header from 'containers/Header';
 import LoginContainer from 'containers/LoginContainer';
 import Notification from 'components/Notification';
+import { motion } from "framer-motion"
 
 export default function App(props) { 
 
+  const [username, setUsername] = useState(props.username);
+  const [email, setEmail] = useState(props.email);
   const [loggedIn, setLoggedIn] = useState(props.loggedIn);
   const [loginDropdown, setLoginDropdown] = useState(props.loginDropdown);
   const [loginRoute, setLoginRoute] = useState(props.loginRoute);
   const [loginMessage, setLoginMessage] = useState(props.loginMessage);
   const [loginError, setLoginError] = useState(props.loginError);
-  const [username, setUsername] = useState(props.username);
-  const [email, setEmail] = useState(props.email);
+  // Notification
+  const [notification, setNotification] = useState(props.notification);
+  const [notificationBox, setNotificationBox] = useState(props.notificationBox);
+  // Login Links
   const [resendEmailLink, setResendEmailLink] = useState(false);
-  const [reEnterEmailForPasswordReset, setReEnterEmailForPasswordReset] = useState(false);
-  const [reEnterEmailForSignup, setReEnterEmailForSignup] = useState(false);
-  const [notification, setNotification] = useState('props.notification');
+  const [reEnterEmailLink, setReEnterEmailLink] = useState(false);
+  const [changeEmailLink, setChangeEmailLink] = useState(false);
 
   // LOG IN
   function login(userData) {
@@ -54,21 +58,23 @@ export default function App(props) {
     setLoginError('');
     setLoginMessage('');
     setResendEmailLink(false);
-    setReEnterEmailForPasswordReset(false);
-    setReEnterEmailForSignup(false);
+    setReEnterEmailLink(false);
+    setReEnterEmailLink(false);
     setLoginDropdown(true);
   };
 
   return (
     <div id="App">
 
-      { notification && 
+      { notificationBox &&
         <Notification 
           setRoute={redirect}
-          notification={notification}
           email={email}
-          username={username}
-          setNotification={setNotification}
+          username={username} setUsername={setUsername}
+          setLoginDropdown={setLoginDropdown}
+          setMessage={setLoginMessage}
+          notification={notification} setNotification={setNotification}
+          notificationBox={notificationBox} setNotificationBox={setNotificationBox}
         />
       }
 
@@ -81,7 +87,7 @@ export default function App(props) {
         setMessage={setLoginMessage}
       />
 
-      { (loginDropdown===true) && 
+      { loginDropdown && 
         <LoginContainer
           loggedIn={loggedIn} setLoggedIn={setLoggedIn}
           route={loginRoute} setRoute={redirect}
@@ -91,18 +97,15 @@ export default function App(props) {
           error={loginError} setError={setLoginError}
           xOut={xOut}
           login={login}
-          resendEmailLink={resendEmailLink}
-          setResendEmailLink={setResendEmailLink}
-          reEnterEmailForPasswordReset={reEnterEmailForPasswordReset}
-          setReEnterEmailForPasswordReset={setReEnterEmailForPasswordReset}
-          reEnterEmailForSignup={reEnterEmailForSignup}
-          setReEnterEmailForSignup={setReEnterEmailForSignup}
+          resendEmailLink={resendEmailLink} setResendEmailLink={setResendEmailLink}
+          reEnterEmailLink={reEnterEmailLink} setReEnterEmailLink={setReEnterEmailLink}
+          reEnterEmailLink={reEnterEmailLink} setReEnterEmailLink={setReEnterEmailLink}
           setLoginDropdown={setLoginDropdown}
           notification={notification} setNotification={setNotification}
+          setNotificationBox={setNotificationBox}
         />
       }
 
-      <div className="fuckass">big ass box</div>
     </div>
   );
 }
