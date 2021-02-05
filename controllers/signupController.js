@@ -176,8 +176,6 @@ signupController.deleteUser = async (req, res, payload) => {
     WHERE email = '${email}'
   `;
 
-  console.log('email submitted:' ,email)
-
   result = await db.query(query); 
   if (result.error) return { end: result.error };
   if (result.affectedRows === 0) return { end: { error: 'did not delete user'} };

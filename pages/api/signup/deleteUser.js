@@ -10,8 +10,6 @@ let result, payload;
 export default async function login(req, res) {
 
   const { email } = req.body;
-
-  console.log('email in deleteUser.js', email)
   
   /* Delete User */
   payload = { email };

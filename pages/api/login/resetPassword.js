@@ -16,7 +16,7 @@ export default async function resetPassword(req, res) {
   result = await loginController.returnUserData(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   const { username, user_id } = result;
@@ -26,7 +26,7 @@ export default async function resetPassword(req, res) {
   result = await signupController.validatePassword(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Hash Password - signup */
@@ -34,7 +34,7 @@ export default async function resetPassword(req, res) {
   result = await signupController.hashPassword(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   const { hashedPassword } = result;
@@ -44,7 +44,7 @@ export default async function resetPassword(req, res) {
   result = await loginController.updatePassword(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Create Access Token */
@@ -52,7 +52,7 @@ export default async function resetPassword(req, res) {
   await tokenController.createAccessToken(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Return data to client / log them in */ 

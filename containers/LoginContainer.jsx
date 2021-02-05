@@ -129,7 +129,7 @@ const LoginContainer = (props) => {
           <button 
             onClick={() => {loadPasswordReset()}} 
             className="click-here-button" 
-            >Wrong email?
+            >Re-enter email
           </button>
         </div> }
 

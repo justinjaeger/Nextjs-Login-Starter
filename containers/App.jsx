@@ -64,15 +64,17 @@ export default function App(props) {
   return (
     <div id="App">
 
-      <Notification 
-        setRoute={redirect}
-        email={email}
-        username={username} setUsername={setUsername}
-        setLoginDropdown={setLoginDropdown}
-        setMessage={setLoginMessage}
-        notification={notification} setNotification={setNotification}
-        notificationBox={notificationBox} setNotificationBox={setNotificationBox}
-      />
+      { notificationBox &&
+        <Notification 
+          setRoute={redirect}
+          email={email}
+          username={username} setUsername={setUsername}
+          setLoginDropdown={setLoginDropdown}
+          setMessage={setLoginMessage}
+          notification={notification} setNotification={setNotification}
+          notificationBox={notificationBox} setNotificationBox={setNotificationBox}
+        />
+      }
 
       <Header
         loggedIn={loggedIn}
@@ -105,7 +107,6 @@ export default function App(props) {
         />
       }
 
-      <div className="fuckass">big ass box</div>
     </div>
   );
 }

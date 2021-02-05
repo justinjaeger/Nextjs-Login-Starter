@@ -20,14 +20,14 @@ export default async function sendPassResetEmail(req, res) {
   result = await loginController.ifEmailNoExistDontSend(req, res, { email });
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Send password reset email */
   result = await emailController.sendResetPasswordEmail(req, res, { email });
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Return a message and a route to client */

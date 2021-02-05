@@ -18,7 +18,7 @@ export default async function login(req, res) {
   result = await signupController.validateEmailAndUsername(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Validate password */
@@ -26,7 +26,7 @@ export default async function login(req, res) {
   result = await signupController.validatePassword(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Hash password */
@@ -34,7 +34,7 @@ export default async function login(req, res) {
   result = await signupController.hashPassword(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   const { hashedPassword } = result;
@@ -44,7 +44,7 @@ export default async function login(req, res) {
   result = await signupController.createUser(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Send Verification Email */
@@ -52,7 +52,7 @@ export default async function login(req, res) {
   result = await emailController.sendVerificationEmail(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Mark the DateCreated field */
@@ -60,7 +60,7 @@ export default async function login(req, res) {
   result = await signupController.markDateCreated(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* set a cookie called sent_verification with value email */

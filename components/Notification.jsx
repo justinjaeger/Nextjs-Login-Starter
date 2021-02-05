@@ -16,16 +16,13 @@ function Blank(props) {
 
   console.log('username in notification', username)
 
-  // When you click "Incorrect Email?"
+  // When you click "Incorrect Email?"poaspoaspoasa
   function deleteUserAndSignUpAgain() {
-    console.log('email being submitted', email)
-    console.log('username before SDFSDFnananana  it', username)
     // Delete the user by email
     axios.post('/api/signup/deleteUser', { email })
     .then(res => {
       if (res.data.error) return setError(res.data.error);
       setRoute('/signup');
-      console.log('username before settnig it', username)
       setUsername(username);
       setNotificationBox(false);
       setMessage(res.data.message);
@@ -38,7 +35,6 @@ function Blank(props) {
 
   // RENDER NOTIFICATION MESSAGE
   function renderNotification(type) {
-    // console.log('emailll', email)
     switch (type) {
       case 'please verify email':
         return [

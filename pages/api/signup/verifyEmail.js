@@ -31,7 +31,7 @@ export default async function verifyEmail(req, res) {
   result = await signupController.authenticateUser(req, res, payload);
   if (result.end) {
     console.log('end: ', result.end)
-    return res.json(result.end);
+    return res.json({ error: result.end });
   };
 
   /* Has to redirect to main page */
