@@ -1,5 +1,5 @@
 const Cookies = require('cookies');
-const { encrypt, decrypt } = require('helpers/encrypt');
+const { encrypt, decrypt } = require('utils/encrypt');
 
 /**
  * When the user clicks the link to reset their password,

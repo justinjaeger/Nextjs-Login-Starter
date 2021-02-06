@@ -1,5 +1,5 @@
 const Cookies = require('cookies');
-const { encrypt, decrypt } = require('helpers/encrypt');
+const { encrypt, decrypt } = require('utils/encrypt');
 
 import signupController from 'controllers/signupController';
 
