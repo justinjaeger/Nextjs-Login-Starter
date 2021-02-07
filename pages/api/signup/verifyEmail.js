@@ -1,18 +1,23 @@
-const Cookies = require('cookies');
-const { encrypt, decrypt } = require('utils/encrypt');
-
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import signupController from 'controllers/signupController';
+const { decrypt } = require('utils/encrypt');
 
 /**
- * When the user clicks the link to verify their email,
- * this decodes the username from the url and sets a cookie
- * that, when the browser sees it, will direct them
- * to re-enter their password
+ * When the user clicks the link INSIDE EMAIL that verifies them
+ * - sets a cookie that, when the browser sees it, 
+ * redirects them to re-enter their password
  */
 
-let result, payload;
+const handler = nextConnect();
 
-export default async function verifyEmail(req, res) {
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
+
+// Functionality
+handler.use(async (req, res, next) => {
 
   const { username } = req.query;
 
@@ -21,20 +26,20 @@ export default async function verifyEmail(req, res) {
   const decryptedUsername = decrypt(decoded);
 
   /* set a cookie in the browser so it loads the re-enter password screen */
-  const cookies = new Cookies(req, res);
-  cookies.set('reset_password'); // clears it
-  cookies.set('sent_verification'); // clears it
-  cookies.set('authenticated', decryptedUsername);
+  res.cookie('reset_password'); // clears it
+  res.cookie('sent_verification'); // clears it
+  res.cookie('authenticated', decryptedUsername);
+
+  res.locals.username = decryptedUsername;
 
   /* Authenticate user in db */
-  payload = { username: decryptedUsername };
-  result = await signupController.authenticateUser(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
+  await signupController.authenticateUser(req, res, next);
+})
 
-  /* Has to redirect to main page */
+// Return
+handler.use((req, res) => {
   /* The main page should see the new cookie and proceed accordingly */
   return res.redirect('/');
-};
+})
+
+export default handler;

@@ -1,65 +1,38 @@
-const Cookies = require('cookies');
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import tokenController from 'controllers/tokenController';
 import loginController from 'controllers/loginController';
 
 /**
- * When the user clicks 'Log In'
+ * When the user clicks Log In
  */
- 
-let result, payload;
 
-export default async function login(req, res) {
+const handler = nextConnect();
 
-  const { emailOrUsername, password } = req.body;
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
 
-  /* Determine entrytype - email or username */
-  const entryType = (emailOrUsername.includes('@')) ? 'email' : 'username';
+// Functionality
+handler.use(async (req, res, next) => {
+
+  res.locals.emailOrUsername = req.body.emailOrUsername;
+  res.locals.password = req.body.password;
+  res.locals.entryType = (emailOrUsername.includes('@')) ? 'email' : 'username';
+  /* ^^^ Determine entry type - email or username */
 
   /* Return User Data - use it to authenticate */
-  payload = { entryType, emailOrUsername };
-  result = await loginController.returnUserData(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-  
-  const { username, email, user_id, dbPassword, authenticated } = result;
+  await loginController.returnUserData(req, res, next);
+})
 
-  /* Verify Password */
-  payload = { password, dbPassword };
-  result = await loginController.verifyPassword(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
-  /* Verify Email Authentication */
-  if (authenticated === 0) {
-    console.log('not authenticated')
-    return res.json({
-      message: `Please verify the email sent to ${email}.`,
-      email: email,
-      username: username,
-    })
-  };
-
-  /* Create Access Token */
-  payload = { user_id };
-  result = await tokenController.createAccessToken(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
-  /* Clear cookies */
-  const cookies = new Cookies(req, res);
-  cookies.set('reset_password');
-  cookies.set('authenticated');
-  cookies.set('sent_verification');
-
-  /* Return data to client */ 
+// Return
+handler.use((req, res) => {
+  /* see loginController.returnUserData for the other data in res.locals we can send */
   return res.json({
     loggedIn: true,
-    username: username,
-  });
-};
+    username: res.locals.username
+  })
+})
+
+export default handler;

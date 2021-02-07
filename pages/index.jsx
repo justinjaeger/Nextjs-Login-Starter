@@ -76,17 +76,22 @@ export async function getServerSideProps(context) {
     props.loginMessage = `Please enter a new password for ${email}.`;
   };
 
-  /* If access token exists, verify it. If so, it populates the page with user data */
-  if (c.access_token) { 
+  /**
+   * This is basically what logs you in.
+   * If access token exists, verify it. 
+   * If verified, populate the page with appropriate user data
+   */
+  if (c.access_token) { // cookie exists when you are logged in
     const payload = { access_token: c.access_token };
-    /* Request to verify token */
-    await axios.post(`${process.env.DEV_ROUTE}/api/user/home`, payload)
+    /**
+     * Request to verify token
+     * The route here is selected based on what is going to load from this index.jsx
+     * At the minimum, we need the username to say "Hi, Username", so that's if we omit a slug
+     * For other prediction pages which will check the cookie, we'll put a slug there to tell it to send back more data
+     * - so long as sticking with SSR, can also just do static loading skeleton w/ client side fetching
+     */
+    await axios.post(`${process.env.DEV_ROUTE}/api/user`, payload)
       .then(res => {
-        console.log('got a result')
-        /* Create tokens in browser if applicable */
-        const cookie = useCookie(context);
-        if (res.data.deleteToken) cookie.remove('access_token');
-        if (res.data.newToken) cookie.set('access_token', res.data.newToken, { httpOnly: true });
         /* If token is verified, set props accordingly */
         if (res.data.loggedIn) {
           props.loggedIn = true;

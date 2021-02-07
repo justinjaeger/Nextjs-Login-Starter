@@ -1,24 +1,33 @@
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import emailController from 'controllers/emailController';
 
 /**
- * sends another verification email
+ * When user clicks "resend verification email"
  */
 
-let payload, result;
+const handler = nextConnect();
 
-export default async function resendVerification(req, res) {
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
 
-  const { email, username } = req.body;
+// Functionality
+handler.use(async (req, res, next) => {
 
-  payload = { email, username };
-  result = await emailController.sendVerificationEmail(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
+  res.locals.email = req.body.email;
+  res.locals.username = req.body.username;
 
+  /* Send verification email */
+  await emailController.sendVerificationEmail(req, res, next);
+})
+
+// Return
+handler.use((req, res) => {
   return res.json({
-    message: `Please verify the email sent to ${req.body.email}.`
-    // SET AN OPTION TO DO A 'wrong email?' -- which will take you to the signup screen with username already filled out
+    message: `Please verify the email sent to ${res.locals.email}.`
   });
-};
+})
+
+export default handler;

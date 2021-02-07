@@ -2,16 +2,20 @@ import db from 'lib/db';
 
 const fn = async (req, res, next) => {
 
-    let query = `SELECT * FROM test WHERE letter='a'`;
-    let result = await db.query(query);
+  console.log('inside fn')
 
-    // handle errors
-    res.handleErrors(result);
-    res.handleEmptyResult(result);
+  let query = `SELECT * FROM test`;
+  let result = await db.query(query);
 
-    // handle success
-    res.locals.data = result[0];
-    return next();
+  console.log('result', result)
+  // handle SQL errors
+  // handle empty result arrays OR "no rows affected"
+  res.handleErrors(result);
+  res.handleEmptyResult(result);
+
+  // handle success
+  res.locals.data = result[0];
+  next();
 };
 
 export default fn;

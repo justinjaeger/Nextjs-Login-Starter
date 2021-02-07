@@ -1,3 +1,5 @@
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import tokenController from 'controllers/tokenController';
 import loginController from 'controllers/loginController';
 import signupController from 'controllers/signupController';
@@ -5,59 +7,40 @@ import signupController from 'controllers/signupController';
 /**
  * When the user clicks Reset Password
  */
- 
-let result, payload;
-export default async function resetPassword(req, res) {
 
-  const { email, password, confirmPassword } = req.body;
+const handler = nextConnect();
+
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
+
+// Functionality
+handler.use(async (req, res, next) => {
+  
+  res.locals.password = req.body.password;
+  res.locals.confirmPassword = req.body.confirmPassword;
+  res.locals.emailOrUsername = req.body.email;
+  res.locals.entryType = 'email';
 
   /* Return User Data - use it to authenticate */
-  payload = { entryType: 'email', emailOrUsername: email };
-  result = await loginController.returnUserData(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
-  const { username, user_id } = result;
-
-  /* Validate Password - signup */
-  payload = { password, confirmPassword };
-  result = await signupController.validatePassword(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
-  /* Hash Password - signup */
-  payload = { password };
-  result = await signupController.hashPassword(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
-  const { hashedPassword } = result;
-
-  /* Update Password - login */
-  payload = { hashedPassword, user_id };
-  result = await loginController.updatePassword(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
+  await loginController.returnUserData(req, res, next);
+  /* Validate Password */
+  await signupController.validatePassword(req, res, next);
+  /* Hash Password */
+  await signupController.hashPassword(req, res, next);
+  /* Update Password */
+  await loginController.updatePassword(req, res, next);
   /* Create Access Token */
-  payload = { user_id };
-  await tokenController.createAccessToken(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
+  await tokenController.createAccessToken(req, res, next);
+})
 
-  /* Return data to client / log them in */ 
+// Return
+handler.use((req, res) => {
   return res.json({
     loggedIn: true,
-    username: username
+    username: res.locals.username
   });
-};
+})
+
+export default handler;

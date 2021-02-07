@@ -1,29 +1,35 @@
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import signupController from 'controllers/signupController';
-const Cookies = require('cookies');
 
 /**
  * When the user clicks 'Incorrect Email'
  */
 
-let result, payload;
+const handler = nextConnect();
 
-export default async function login(req, res) {
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
 
-  const { email } = req.body;
+// Functionality
+handler.use(async (req, res, next) => {
+
+  res.locals.email = req.body;
   
   /* Delete User */
-  payload = { email };
-  result = await signupController.deleteUser(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json({ error: result.end });
-  };
+  await signupController.deleteUser(req, res, next);
+})
 
+// Return
+handler.use((req, res) => {
   /* Clear Cookie */
-  const cookies = new Cookies(req, res);
-  cookies.set('sent_verification');
+  res.cookie('sent_verification');
 
   return res.json({
     message: `Account reset - please enter new email.`
   });
-};
+})
+
+export default handler;

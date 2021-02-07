@@ -1,15 +1,24 @@
-import tokenController from 'controllers/tokenController';
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import emailController from 'controllers/emailController';
 import loginController from 'controllers/loginController';
-
 
 /**
  * When the user submits "forgot password", which sends an email
  */
-let result, payload;
-export default async function sendPassResetEmail(req, res) {
 
-  const { email } = req.body;
+const handler = nextConnect();
+
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
+
+// Functionality
+handler.use(async (req, res, next) => {
+
+  const { email } = req.body.email;
+  res.locals.email = email;
 
   /* Check if email is valid */
   if (!email.includes('@') || !email.includes('.') ) {
@@ -17,23 +26,17 @@ export default async function sendPassResetEmail(req, res) {
   };
 
   /* Check if email exists -- if no, don't send an email */
-  result = await loginController.ifEmailNoExistDontSend(req, res, { email });
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
+  await loginController.ifEmailNoExistDontSend(req, res, next);
   /* Send password reset email */
-  result = await emailController.sendResetPasswordEmail(req, res, { email });
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
+  await emailController.sendResetPasswordEmail(req, res, next);
+})
 
-  /* Return a message and a route to client */
+// Return
+handler.use((req, res) => {
   return res.json({ 
     message: `An email was sent to ${req.body.email}.`,
-    // SET A ROUTE TO SEND GO BACK AND SEND THE EMAIL AGAIN IF IT'S WRONG 'enter email again'
     route: '/blank',
   });
-};
+})
+
+export default handler;

@@ -50,6 +50,7 @@ export default function App(props) {
   function xOut() {
     setLoginDropdown(false);
     setLoginMessage('');
+    setLoginMessage('');
   };
 
   // REROUTE (has to be its own function cause error messages need to be deleted)
@@ -59,7 +60,7 @@ export default function App(props) {
     setLoginMessage('');
     setResendEmailLink(false);
     setReEnterEmailLink(false);
-    setReEnterEmailLink(false);
+    setChangeEmailLink(false);
     setLoginDropdown(true);
   };
 
@@ -95,14 +96,14 @@ export default function App(props) {
           email={email} setEmail={setEmail}
           message={loginMessage} setMessage={setLoginMessage}
           error={loginError} setError={setLoginError}
-          xOut={xOut}
-          login={login}
           resendEmailLink={resendEmailLink} setResendEmailLink={setResendEmailLink}
           reEnterEmailLink={reEnterEmailLink} setReEnterEmailLink={setReEnterEmailLink}
-          reEnterEmailLink={reEnterEmailLink} setReEnterEmailLink={setReEnterEmailLink}
+          changeEmailLink={changeEmailLink} setChangeEmailLink={setChangeEmailLink}
           setLoginDropdown={setLoginDropdown}
           notification={notification} setNotification={setNotification}
           setNotificationBox={setNotificationBox}
+          xOut={xOut}
+          login={login}
         />
       }
 

@@ -1,6 +1,8 @@
-import cookie from 'utils/connectWrapper';
+import cookie from 'utils/cookies';
 
 const handler = (req, res, next) => {
+
+  res.cookie = (name, value, options) => cookie(res, name, value, options);
 
   res.locals = {};
 
@@ -17,14 +19,21 @@ const handler = (req, res, next) => {
     - if no message, it throws an error / 500 status
   */
   res.handleEmptyResult = (result, message) => {
-    if (!result[0]) {
-      return (message) 
+    // first check if affected rows is less than one
+    if (result.affectedRows) {
+      if (result.affectedRows === 0) {
+        return (message) 
         ? res.json(message) 
         : next(Error('Did not affect any rows in db'));
+      };
+    // not all queries hav affectedRows property... some queries return data
+    // in that case, if no data is returned, flag it
+    } else if (result[0] === undefined) {
+      return (message) 
+        ? res.json(message) 
+        : next(Error('Did not return any data from db'));
     };
   };
-
-  res.cookie = (name, value, options) => cookie(res, name, value, options);
 
   return next();
 };

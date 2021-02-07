@@ -13,7 +13,10 @@ const cookie = (res, name, value, options = {}) => {
     options.maxAge /= 1000
   }
 
-  res.setHeader('Set-Cookie', serialize(name, String(stringValue), options))
-};
+  // if no value, it deletes the cookie
+  return (value)
+    ? res.setHeader('Set-Cookie', serialize(name, String(stringValue), options))
+    : res.setHeader('Set-Cookie', serialize(name, '', {expires : new Date(Date.now() - 1000) }))
+}
 
 module.exports = cookie;

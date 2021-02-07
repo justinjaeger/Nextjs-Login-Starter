@@ -1,14 +1,15 @@
-const { encrypt, decrypt } = require('utils/encrypt');
+const { default: nextConnect } = require('next-connect');
+const { encrypt } = require('utils/encrypt');
 const mailHelper = require('utils/mailHelper');
 
 const emailController = {};
+let result, query;
 
-let result, query, payload;
 /*************************************/
 
-emailController.sendVerificationEmail = (req, res, payload) => {
+emailController.sendVerificationEmail = (req, res, next) => {
 
-  const { email, username } = payload;
+  const { email, username } = res.locals;
 
   /* Create the URL that takes the user to reset password page */
   const DEV_ROUTE = process.env.DEV_ROUTE;
@@ -21,16 +22,16 @@ emailController.sendVerificationEmail = (req, res, payload) => {
 
   /* Actually sends the email */
   result = transport.sendMail(emailVerificationOptions);
-  if (result.error) return { end: result.error };
+  res.handleErrors(result);
 
-  return {};
+  return next();
 };
 
 /*************************************/
 
-emailController.sendResetPasswordEmail = (req, res, payload) => {
+emailController.sendResetPasswordEmail = (req, res, next) => {
 
-  const { email } = payload;
+  const { email } = res.locals;
 
   /* Create the URL that takes the user to reset password page */
   const DEV_ROUTE = process.env.DEV_ROUTE;
@@ -43,9 +44,9 @@ emailController.sendResetPasswordEmail = (req, res, payload) => {
   
   /* Actually sends the email */
   result = transport.sendMail(passwordResetOptions);
-  if (result.error) return { end: result.error };
+  res.handleErrors(result);
 
-  return {};
+  return next();
 };
 
 /*************************************/

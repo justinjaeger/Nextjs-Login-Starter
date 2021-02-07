@@ -1,73 +1,50 @@
-import loginController from 'controllers/loginController';
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import emailController from 'controllers/emailController';
 import signupController from 'controllers/signupController';
-const Cookies = require('cookies');
 
 /**
  * When the user clicks 'Sign Up'
  */
 
-let result, payload;
+const handler = nextConnect();
 
-export default async function login(req, res) {
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
 
-  const { email, username, password, confirmPassword } = req.body;
+// Functionality
+handler.use(async (req, res, next) => {
+
+  res.locals.email = req.body.email;
+  res.locals.username = req.body.username;
+  res.locals.password = req.body.password;
+  res.locals.confirmPassword = req.body.confirmPassword;
 
   /* Validate email and username */
-  payload = { email, username };
-  result = await signupController.validateEmailAndUsername(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
+  await signupController.validateEmailAndUsername(req, res, next);
   /* Validate password */
-  payload = { password, confirmPassword };
-  result = await signupController.validatePassword(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
+  await signupController.validatePassword(req, res, next);
   /* Hash password */
-  payload = { password };
-  result = await signupController.hashPassword(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
-  const { hashedPassword } = result;
-
+  await signupController.hashPassword(req, res, next);
   /* Create user */
-  payload = { email, username, password: hashedPassword };
-  result = await signupController.createUser(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
+  await signupController.createUser(req, res, next);
   /* Send Verification Email */
-  payload = { email, username };
-  result = await emailController.sendVerificationEmail(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-
+  await emailController.sendVerificationEmail(req, res, next);
   /* Mark the DateCreated field */
-  payload = { username };
-  result = await signupController.markDateCreated(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
+  await signupController.markDateCreated(req, res, next);
+})
+
+// Return
+handler.use((req, res) => {
 
   /* set a cookie called sent_verification with value email */
-  const cookies = new Cookies(req, res);
-  cookies.set('sent_verification', `${username}*$%&${email}`);
+  res.cookie('sent_verification', `${res.locals.username}*$%&${res.locals.email}`);
 
   return res.json({
-    message: `Please verify the email sent to ${email}.`
+    message: `Please verify the email sent to ${res.locals.email}.`
   });
-};
+})
+
+export default handler;

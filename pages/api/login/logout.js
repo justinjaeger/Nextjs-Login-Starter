@@ -1,31 +1,32 @@
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
 import tokenController from 'controllers/tokenController';
-const jwt = require('jsonwebtoken');
-const Cookies = require('cookies');
 
 /**
- * When the user clicks 'Log Out'
+ * When the user clicks Log Out
  */
-let result, payload;
-export default async function logout(req, res) {
 
-  /* Get the access_token */
-  const access_token = req.cookies.access_token;
+const handler = nextConnect();
 
-  /* Get the user_id from the token */
-  result = await jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET, {ignoreExpiration: true});
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
-  const { user_id } = result
-  
-  /* Delete access token */
-  payload = { access_token, user_id };
-  result = await tokenController.deleteAccessToken(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
+// Universal Middleware
+handler.use((req, res, next) => {
+  universalMid(req, res, next);
+});
 
-  return res.json({});
-};
+// Functionality
+handler.use(async (req, res, next) => {
+
+  res.locals.access_token = req.cookies.access_token;
+
+  /* Get user_id from token */
+  await tokenController.getTokenData(req, res, next);
+  /* Delete access token on client and db */
+  await tokenController.deleteAccessToken(req, res, next);
+})
+
+// Return
+handler.use((req, res) => {
+  return res.json({})
+})
+
+export default handler;
