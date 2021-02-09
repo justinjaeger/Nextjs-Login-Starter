@@ -2,9 +2,14 @@ import cookie from 'utils/cookies';
 
 const handler = (req, res, next) => {
 
+  res.cookieArray = [];
+
   res.cookie = (name, value, options) => cookie(res, name, value, options);
 
+  res.sendCookies = () => res.setHeader('set-cookie', res.cookieArray);
+
   res.locals = {};
+  res.assholes = {};
 
   /* handles SQL errors, sends 500 status by default */
   res.handleErrors = result => {

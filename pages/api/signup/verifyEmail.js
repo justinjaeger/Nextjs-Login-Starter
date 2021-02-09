@@ -1,5 +1,4 @@
-import nextConnect from 'next-connect';
-import universalMid from 'utils/universalMid';
+import wrapper from 'utils/wrapper';
 import signupController from 'controllers/signupController';
 const { decrypt } = require('utils/encrypt');
 
@@ -9,37 +8,34 @@ const { decrypt } = require('utils/encrypt');
  * redirects them to re-enter their password
  */
 
-const handler = nextConnect();
+const handler = async (req, res) => {
 
-// Universal Middleware
-handler.use((req, res, next) => {
-  universalMid(req, res, next);
-});
+  try {
+    const { username } = req.query;
 
-// Functionality
-handler.use(async (req, res, next) => {
+    /* decode and decrypt the username */
+    const decoded = decodeURIComponent(username);
+    const decryptedUsername = decrypt(decoded);
 
-  const { username } = req.query;
+    /* set a cookie in the browser so it loads the re-enter password screen */
+    res.cookie('reset_password'); // clears it
+    res.cookie('sent_verification'); // clears it
+    res.cookie('authenticated', decryptedUsername);
 
-  /* decode and decrypt the username */
-  const decoded = decodeURIComponent(username);
-  const decryptedUsername = decrypt(decoded);
+    res.locals.username = decryptedUsername;
 
-  /* set a cookie in the browser so it loads the re-enter password screen */
-  res.cookie('reset_password'); // clears it
-  res.cookie('sent_verification'); // clears it
-  res.cookie('authenticated', decryptedUsername);
+    /* Authenticate user in db */
+    await signupController.authenticateUser(req, res);
 
-  res.locals.username = decryptedUsername;
+    res.sendCookies();
+    return res.redirect('/');
+  } 
 
-  /* Authenticate user in db */
-  await signupController.authenticateUser(req, res, next);
-})
+  catch(e) {
+    console.log('error ', e);
+    return res.status(500).send(e.message);
+  }
 
-// Return
-handler.use((req, res) => {
-  /* The main page should see the new cookie and proceed accordingly */
-  return res.redirect('/');
-})
+};
 
-export default handler;
+export default wrapper(handler);

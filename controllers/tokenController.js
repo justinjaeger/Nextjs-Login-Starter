@@ -6,7 +6,7 @@ let result, query;
 
 /*************************************/
 
-tokenController.verifyToken = async (req, res, next) => {
+tokenController.verifyToken = async (req, res) => {
 
   console.log('inside verifyToken');
 
@@ -29,24 +29,19 @@ tokenController.verifyToken = async (req, res, next) => {
     res.cookie('access_token');
 
     /* DELETE ACCESS TOKEN FROM DB */
-    result = await tokenController.deleteAccessToken(req, res, next);
-    res.handleErrors(result);
-    res.handleEmptyResult(result);
+    await tokenController.deleteAccessToken(req, res);
 
     /* and CREATE NEW ACCESS TOKEN */
-    result = await tokenController.createAccessToken(req, res, next);
-    res.handleErrors(result);
-    res.handleEmptyResult(result);
+    await tokenController.createAccessToken(req, res);
+
     /* Set new cookie in browser */
     res.cookie('access_token', result.access_token, { httpOnly: true })
   };
-
-  return next();
 };
 
 /*************************************/
 
-tokenController.createAccessToken = async (req, res, next) => {
+tokenController.createAccessToken = async (req, res) => {
 
   console.log('inside createAccessToken')
 
@@ -59,7 +54,7 @@ tokenController.createAccessToken = async (req, res, next) => {
 
   /* CREATE ACCESS TOKEN */
   const accessPayload = { user_id };
-  const accessOptions = { expiresIn: '10m'}; /* change the expiration here */
+  const accessOptions = { expiresIn: '1s'}; /* change the expiration here */
   const access_token = jwt.sign(accessPayload,  process.env.ACCESS_TOKEN_SECRET, accessOptions);
   
   /* SAVE TOKEN IN DB */
@@ -84,20 +79,15 @@ tokenController.createAccessToken = async (req, res, next) => {
   res.handleEmptyResult(result);
 
   res.locals.access_token = access_token;
-
-  return next();
 };
 
 /*************************************/
 
-tokenController.deleteAccessToken = async (req, res, next) => {
+tokenController.deleteAccessToken = async (req, res) => {
 
   console.log('inside deleteAccessToken')
 
-  const { access_token } = res.locals;
-
-  /* Clear browser token */
-  res.cookie('access_token');
+  const { access_token, user_id } = res.locals;
 
   /* Delete the access token in db */
   query = `
@@ -105,40 +95,28 @@ tokenController.deleteAccessToken = async (req, res, next) => {
     WHERE access_token="${access_token}" `;
   result = await db.query(query);
   res.handleErrors(result);
+
+  console.log('token deleted')
+
   /* if it affected no rows, that means a hacker already used the access token. 
   Therefore, we delete all user tokens and end middleware chain. */
   if (result.affectedRows === 0) { 
-    await tokenController.deleteAllUserTokens(req, res, next);
-    return res.json({});
-  };
-
-  return next();
-};
-
-/*************************************/
-
-tokenController.deleteAllUserTokens = async (req, res, next) => {
-
-  console.log('inside deleteAllUserTokens')
-
-  const { user_id } = res.locals;
-
-  /* delete all tokens associated with user */
-  query = `
+    console.log('deleting all user tokens')
+    /* Delete all tokens associated with user */
+    query = `
     DELETE FROM tokens
     WHERE user_id=${user_id}`;
-  result = await db.query(query);
-  res.handleErrors(result);
-  res.handleEmptyResult(result);
+    result = await db.query(query);
+    res.handleErrors(result);
 
-  console.log('deleted all user tokenss')
-  
-  return next();
+    console.log('cookie array: ', res.cookieArray)
+    throw new Error(res);
+  };
 };
 
 /*************************************/
 
-tokenController.getTokenData = async (req, res, next) => {
+tokenController.getTokenData = async (req, res) => {
 
   console.log('inside getTokenData');
 
@@ -147,9 +125,7 @@ tokenController.getTokenData = async (req, res, next) => {
   /* Get the user_id from the JWT */
   result = await jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET, {ignoreExpiration: true});
   res.handleErrors(result);
-  res.locals.user_id = result;
-
-  return next();
+  res.locals.user_id = result.user_id;
 };
 
 /*************************************/

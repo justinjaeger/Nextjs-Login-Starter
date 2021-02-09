@@ -1,4 +1,5 @@
 import db from 'lib/db';
+import { join } from './profanityList';
 
 const fn = async (req, res, next) => {
 
@@ -6,8 +7,10 @@ const fn = async (req, res, next) => {
 
   let query = `SELECT * FROM test`;
   let result = await db.query(query);
+  
+  if (result) return next();
+  console.log('should not see this')
 
-  console.log('result', result)
   // handle SQL errors
   // handle empty result arrays OR "no rows affected"
   res.handleErrors(result);
@@ -15,7 +18,6 @@ const fn = async (req, res, next) => {
 
   // handle success
   res.locals.data = result[0];
-  next();
 };
 
 export default fn;

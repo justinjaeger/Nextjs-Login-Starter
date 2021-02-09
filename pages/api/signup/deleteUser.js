@@ -1,35 +1,31 @@
-import nextConnect from 'next-connect';
-import universalMid from 'utils/universalMid';
+import wrapper from 'utils/wrapper';
 import signupController from 'controllers/signupController';
 
 /**
  * When the user clicks 'Incorrect Email'
  */
 
-const handler = nextConnect();
+const handler = async (req, res) => {
 
-// Universal Middleware
-handler.use((req, res, next) => {
-  universalMid(req, res, next);
-});
-
-// Functionality
-handler.use(async (req, res, next) => {
-
-  res.locals.email = req.body;
+  try {
+    res.locals.email = req.body;
   
-  /* Delete User */
-  await signupController.deleteUser(req, res, next);
-})
+    /* Delete User */
+    await signupController.deleteUser(req, res);
 
-// Return
-handler.use((req, res) => {
-  /* Clear Cookie */
-  res.cookie('sent_verification');
+    res.cookie('sent_verification');
 
-  return res.json({
-    message: `Account reset - please enter new email.`
-  });
-})
+    res.sendCookies();
+    return res.json({
+      message: `Account reset - please enter new email.`
+    });
+  } 
 
-export default handler;
+  catch(e) {
+    console.log('error ', e)
+    return res.status(500).send(e.message);
+  }
+
+};
+
+export default wrapper(handler);

@@ -1,32 +1,29 @@
-import nextConnect from 'next-connect';
-import universalMid from 'utils/universalMid';
+import wrapper from 'utils/wrapper';
 import tokenController from 'controllers/tokenController';
 
 /**
  * When the user clicks Log Out
  */
 
-const handler = nextConnect();
+const handler = async (req, res) => {
 
-// Universal Middleware
-handler.use((req, res, next) => {
-  universalMid(req, res, next);
-});
+  try {
+    res.locals.access_token = req.cookies.access_token;
 
-// Functionality
-handler.use(async (req, res, next) => {
+    /* Get user_id from token */
+    await tokenController.getTokenData(req, res);
+    /* Delete access token on client and db */
+    await tokenController.deleteAccessToken(req, res);
+  
+    res.sendCookies();
+    return res.json({})
+  } 
 
-  res.locals.access_token = req.cookies.access_token;
+  catch(e) {
+    console.log('error ', e)
+    return res.status(500).send(e.message);
+  }
 
-  /* Get user_id from token */
-  await tokenController.getTokenData(req, res, next);
-  /* Delete access token on client and db */
-  await tokenController.deleteAccessToken(req, res, next);
-})
+};
 
-// Return
-handler.use((req, res) => {
-  return res.json({})
-})
-
-export default handler;
+export default wrapper(handler);

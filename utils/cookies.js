@@ -4,19 +4,31 @@ import { serialize } from 'cookie'
  * This sets `cookie` on `res` object
  */
 
-const cookie = (res, name, value, options = {}) => {
+const cookie = (res, name, value, options) => {
+
+  if (!options) options = {};
+  options.path = '/';
+
   const stringValue =
     typeof value === 'object' ? 'j:' + JSON.stringify(value) : String(value)
 
   if ('maxAge' in options) {
-    options.expires = new Date(Date.now() + options.maxAge)
-    options.maxAge /= 1000
+    options.expires = new Date(Date.now() + options.maxAge);
+    options.maxAge /= 1000;
   }
 
+  // console.log('RES.FINISHED in cookie', res.finished)
+
+  if (!value) {
+    options.expires = new Date(Date.now() - 1000);
+  };
+
   // if no value, it deletes the cookie
-  return (value)
-    ? res.setHeader('Set-Cookie', serialize(name, String(stringValue), options))
-    : res.setHeader('Set-Cookie', serialize(name, '', {expires : new Date(Date.now() - 1000) }))
+  if (value) {
+    res.cookieArray.push(serialize(name, String(stringValue), options))
+  } else {
+    res.cookieArray.push(serialize(name, '', options))
+  };
 }
 
-module.exports = cookie;
+export default cookie;

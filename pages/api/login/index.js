@@ -1,5 +1,4 @@
-import nextConnect from 'next-connect';
-import universalMid from 'utils/universalMid';
+import wrapper from 'utils/wrapper';
 import tokenController from 'controllers/tokenController';
 import loginController from 'controllers/loginController';
 
@@ -7,32 +6,35 @@ import loginController from 'controllers/loginController';
  * When the user clicks Log In
  */
 
-const handler = nextConnect();
+const handler = async (req, res) => {
 
-// Universal Middleware
-handler.use((req, res, next) => {
-  universalMid(req, res, next);
-});
+  try {
+    res.locals.emailOrUsername = req.body.emailOrUsername;
+    res.locals.password = req.body.password;
+    res.locals.entryType = (res.locals.emailOrUsername.includes('@')) ? 'email' : 'username';
+    /* ^^^ Determine entry type - email or username */
 
-// Functionality
-handler.use(async (req, res, next) => {
+    /* Return User Data - use it to authenticate */
+    await loginController.returnUserData(req, res);
+    /* Verify Password */
+    await loginController.verifyPassword(req, res)
+    /* Verify Email Authentication */
+    await loginController.verifyEmailAuthenticated(req, res);
+    /* Create Access Token */
+    await tokenController.createAccessToken(req, res);
 
-  res.locals.emailOrUsername = req.body.emailOrUsername;
-  res.locals.password = req.body.password;
-  res.locals.entryType = (emailOrUsername.includes('@')) ? 'email' : 'username';
-  /* ^^^ Determine entry type - email or username */
+    res.sendCookies();
+    return res.json({
+      loggedIn: true,
+      username: res.locals.username
+    })
+  }
 
-  /* Return User Data - use it to authenticate */
-  await loginController.returnUserData(req, res, next);
-})
+  catch(e) {
+    console.log('error in /login ', e.message);
+    return res.status(500).send(e.message);
+  }
 
-// Return
-handler.use((req, res) => {
-  /* see loginController.returnUserData for the other data in res.locals we can send */
-  return res.json({
-    loggedIn: true,
-    username: res.locals.username
-  })
-})
+};
 
-export default handler;
+export default wrapper(handler);

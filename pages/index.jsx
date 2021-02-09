@@ -82,6 +82,7 @@ export async function getServerSideProps(context) {
    * If verified, populate the page with appropriate user data
    */
   if (c.access_token) { // cookie exists when you are logged in
+
     const payload = { access_token: c.access_token };
     /**
      * Request to verify token
@@ -90,7 +91,7 @@ export async function getServerSideProps(context) {
      * For other prediction pages which will check the cookie, we'll put a slug there to tell it to send back more data
      * - so long as sticking with SSR, can also just do static loading skeleton w/ client side fetching
      */
-    await axios.post(`${process.env.DEV_ROUTE}/api/user`, payload)
+    await axios.post(`${process.env.DEV_ROUTE}/api/user/home`, payload)
       .then(res => {
         /* If token is verified, set props accordingly */
         if (res.data.loggedIn) {

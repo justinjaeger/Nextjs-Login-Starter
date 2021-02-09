@@ -1,33 +1,30 @@
-import nextConnect from 'next-connect';
-import universalMid from 'utils/universalMid';
+import wrapper from 'utils/wrapper';
 import emailController from 'controllers/emailController';
 
 /**
  * When user clicks "resend verification email"
  */
 
-const handler = nextConnect();
+const handler = async (req, res) => {
 
-// Universal Middleware
-handler.use((req, res, next) => {
-  universalMid(req, res, next);
-});
+  try {
+    res.locals.email = req.body.email;
+    res.locals.username = req.body.username;
 
-// Functionality
-handler.use(async (req, res, next) => {
+    /* Send verification email */
+    await emailController.sendVerificationEmail(req, res);
 
-  res.locals.email = req.body.email;
-  res.locals.username = req.body.username;
+    res.sendCookies();
+    return res.json({
+      message: `Please verify the email sent to ${res.locals.email}.`
+    });
+  } 
 
-  /* Send verification email */
-  await emailController.sendVerificationEmail(req, res, next);
-})
+  catch(e) {
+    console.log('error ', e)
+    return res.status(500).send(e.message);
+  }
 
-// Return
-handler.use((req, res) => {
-  return res.json({
-    message: `Please verify the email sent to ${res.locals.email}.`
-  });
-})
+};
 
-export default handler;
+export default wrapper(handler);

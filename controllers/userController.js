@@ -5,7 +5,7 @@ let result, query;
 
 /*************************************/
 
-userController.getUsername = async (req, res, next) => {
+userController.getUsername = async (req, res) => {
 
   const { user_id } = res.locals;
 
@@ -17,9 +17,7 @@ userController.getUsername = async (req, res, next) => {
   res.handleErrors(result);
   res.handleEmptyResult(result);
 
-  res.locals.username = result[0];
-
-  return next();
+  res.locals.username = result[0].username;
 };
 
 /*************************************/

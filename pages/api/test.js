@@ -1,20 +1,17 @@
-import fn from 'utils/testFunction';
 import wrapper from 'utils/wrapper';
 
 const handler = async (req, res) => {
 
   try {
-    await fn(req, res);
-    res.cookie('asshole', 'asshole')
-    return res.send(res.locals.data);
+
+    res.sendCookies();
+    return res.json({})
   } 
 
   catch(e) {
-    console.log('e',e)
+    console.log('error ', e);
     return res.status(500).send(e.message);
   }
-
-  // return res.send(`Db returned ${result.data}`);
 
 };
 

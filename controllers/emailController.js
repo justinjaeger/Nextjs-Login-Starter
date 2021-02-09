@@ -1,4 +1,3 @@
-const { default: nextConnect } = require('next-connect');
 const { encrypt } = require('utils/encrypt');
 const mailHelper = require('utils/mailHelper');
 
@@ -7,7 +6,7 @@ let result, query;
 
 /*************************************/
 
-emailController.sendVerificationEmail = (req, res, next) => {
+emailController.sendVerificationEmail = (req, res) => {
 
   const { email, username } = res.locals;
 
@@ -23,13 +22,11 @@ emailController.sendVerificationEmail = (req, res, next) => {
   /* Actually sends the email */
   result = transport.sendMail(emailVerificationOptions);
   res.handleErrors(result);
-
-  return next();
 };
 
 /*************************************/
 
-emailController.sendResetPasswordEmail = (req, res, next) => {
+emailController.sendResetPasswordEmail = (req, res) => {
 
   const { email } = res.locals;
 
@@ -45,8 +42,6 @@ emailController.sendResetPasswordEmail = (req, res, next) => {
   /* Actually sends the email */
   result = transport.sendMail(passwordResetOptions);
   res.handleErrors(result);
-
-  return next();
 };
 
 /*************************************/

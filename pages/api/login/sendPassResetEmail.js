@@ -1,5 +1,4 @@
-import nextConnect from 'next-connect';
-import universalMid from 'utils/universalMid';
+import wrapper from 'utils/wrapper';
 import emailController from 'controllers/emailController';
 import loginController from 'controllers/loginController';
 
@@ -7,36 +6,34 @@ import loginController from 'controllers/loginController';
  * When the user submits "forgot password", which sends an email
  */
 
-const handler = nextConnect();
+const handler = async (req, res) => {
 
-// Universal Middleware
-handler.use((req, res, next) => {
-  universalMid(req, res, next);
-});
+  try {
+    const { email } = req.body.email;
+    res.locals.email = email;
 
-// Functionality
-handler.use(async (req, res, next) => {
+    /* Check if email is valid */
+    if (!email.includes('@') || !email.includes('.') ) {
+      return res.json({ error : 'this email is not properly formatted' });
+    };
 
-  const { email } = req.body.email;
-  res.locals.email = email;
+    /* Check if email exists -- if no, don't send an email */
+    await loginController.ifEmailNoExistDontSend(req, res);
+    /* Send password reset email */
+    await emailController.sendResetPasswordEmail(req, res);
 
-  /* Check if email is valid */
-  if (!email.includes('@') || !email.includes('.') ) {
-    return res.json({ error : 'this email is not properly formatted' });
-  };
+    res.sendCookies();
+    return res.json({ 
+      message: `An email was sent to ${req.body.email}.`,
+      route: '/blank',
+    });
+  } 
 
-  /* Check if email exists -- if no, don't send an email */
-  await loginController.ifEmailNoExistDontSend(req, res, next);
-  /* Send password reset email */
-  await emailController.sendResetPasswordEmail(req, res, next);
-})
+  catch(e) {
+    console.log('error ', e)
+    return res.status(500).send(e.message);
+  }
 
-// Return
-handler.use((req, res) => {
-  return res.json({ 
-    message: `An email was sent to ${req.body.email}.`,
-    route: '/blank',
-  });
-})
+};
 
-export default handler;
+export default wrapper(handler);

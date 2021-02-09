@@ -14,7 +14,7 @@ let result, query;
  * - note: Imports helper functions from the 'misc' folder
  */
 
-signupController.validateEmailAndUsername = (req, res, next) => {
+signupController.validateEmailAndUsername = (req, res) => {
 
   const { email, username } = res.locals;
 
@@ -34,13 +34,11 @@ signupController.validateEmailAndUsername = (req, res, next) => {
   if (profanityFilter(username) === true) {
     return res.json({ error : 'Profanity is not allowed in your username' });
   };
-
-  return next();
 };
 
 /*************************************/
 
-signupController.validatePassword = (req, res, next) => {
+signupController.validatePassword = (req, res) => {
   
   const { password, confirmPassword } = res.locals;
 
@@ -57,13 +55,11 @@ signupController.validatePassword = (req, res, next) => {
   if (password.length > 20) {
     return res.json({ error : 'password must be less than 20 characters' });
   };
-
-  return next();
 };
 
 /*************************************/
 
-signupController.hashPassword = async (req, res, next) => {
+signupController.hashPassword = async (req, res) => {
 
   const { password } = res.locals;
 
@@ -73,13 +69,11 @@ signupController.hashPassword = async (req, res, next) => {
 
   /* store the hashed password */
   res.locals.hashedPassword = result;
-
-  return next();
 };
 
 /*************************************/
 
-signupController.createUser = async (req, res, next) => {
+signupController.createUser = async (req, res) => {
 
   const { email, username, password: hashedPassword } = res.locals;
 
@@ -99,13 +93,11 @@ signupController.createUser = async (req, res, next) => {
     res.handleErrors(result);
   };
   res.handleEmptyResult(result);
-
-  return next();
 };
 
 /*************************************/
 
-signupController.authenticateUser = async (req, res, next) => {
+signupController.authenticateUser = async (req, res) => {
 
   const { username } = res.locals;
 
@@ -117,13 +109,11 @@ signupController.authenticateUser = async (req, res, next) => {
   result = await db.query(query); 
   res.handleErrors(result);
   res.handleEmptyResult(result);
-
-  return next();
 };
 
 /*************************************/
 
-signupController.getUserIdByUsername = async (req, res, next) => {
+signupController.getUserIdByUsername = async (req, res) => {
 
   const { username } = res.locals;
 
@@ -137,13 +127,11 @@ signupController.getUserIdByUsername = async (req, res, next) => {
   res.handleEmptyResult(result);
 
   res.locals.user_id = result[0];
-  
-  return next();
 };
 
 /*************************************/
 
-signupController.markDateCreated = async (req, res, next) => {
+signupController.markDateCreated = async (req, res) => {
 
   const { username } = res.locals;
 
@@ -158,13 +146,11 @@ signupController.markDateCreated = async (req, res, next) => {
   result = await db.query(query); 
   res.handleErrors(result);
   res.handleEmptyResult(result);
-
-  return next();
 };
 
 /*************************************/
 
-signupController.deleteUser = async (req, res, next) => {
+signupController.deleteUser = async (req, res) => {
 
   const { email } = res.locals;
 
@@ -175,8 +161,6 @@ signupController.deleteUser = async (req, res, next) => {
   result = await db.query(query); 
   res.handleErrors(result);
   res.handleEmptyResult(result, { error: 'did not delete user'});
-
-  return next();
 };
 
 /*************************************/

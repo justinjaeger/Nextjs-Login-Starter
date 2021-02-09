@@ -6,24 +6,24 @@ let query, result;
 
 /*************************************/
 
-loginController.verifyPassword = async (req, res, next) => {
+loginController.verifyPassword = async (req, res) => {
+
+  // console.log('verifyPassword')
 
   const { password, dbPassword } = res.locals;
 
   /* Verify password with bcrypt */
   result = await bcrypt.compare(password, dbPassword);
-  res.handleErrors(result);
   /* If it returns false, set error on client */
   if (result === false) {
+    console.log('fuck')
     return res.json({ error: `Credentials do not match` });
   };
-
-  return next();
 };
 
 /*************************************/
 
-loginController.returnUserData = async (req, res, next) => {
+loginController.returnUserData = async (req, res) => {
 
   const { entryType, emailOrUsername } = res.locals;
 
@@ -45,9 +45,6 @@ loginController.returnUserData = async (req, res, next) => {
   res.locals.user_id = user_id;
   res.locals.dbPassword = dbPassword;
   res.locals.authenticated = authenticated;
-
-  /* Return the data */
-  return next();
 };
 
 /*************************************/
@@ -59,7 +56,7 @@ loginController.returnUserData = async (req, res, next) => {
  * - if it returns a user_id, we proceed to next middleware
  */
 
-loginController.ifEmailNoExistDontSend = async (req, res, next) => {
+loginController.ifEmailNoExistDontSend = async (req, res) => {
   
   const { email } = res.locals;
 
@@ -76,14 +73,11 @@ loginController.ifEmailNoExistDontSend = async (req, res, next) => {
     message: `An email was sent to ${req.body.email}.`,
     route: '/blank',
   });
-
-  /* If we are here, it means the user was found and we continue */
-  return next();
 };
 
 /*************************************/
 
-loginController.updatePassword = async (req, res, next) => {
+loginController.updatePassword = async (req, res) => {
 
   const { hashedPassword, user_id } = res.locals;
 
@@ -95,8 +89,22 @@ loginController.updatePassword = async (req, res, next) => {
   result = await db.query(query);
   res.handleErrors(result);
   res.handleEmptyResult(result);
+};
 
-  return next();
+/*************************************/
+
+loginController.verifyEmailAuthenticated = (req, res) => {
+
+  const { authenticated } = res.locals;
+
+  if (authenticated === 0) {
+    console.log('not authenticated')
+    return res.json({
+      message: `Please verify the email sent to ${email}.`,
+      email: email,
+      username: username,
+    })
+  };
 };
 
 /*************************************/
