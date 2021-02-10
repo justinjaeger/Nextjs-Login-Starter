@@ -23,6 +23,7 @@ const handler = async (req, res) => {
     /* Create Access Token */
     await tokenController.createAccessToken(req, res);
 
+    res.cookie('fuckface', 'fuckface')
     res.sendCookies();
     return res.json({
       loggedIn: true,

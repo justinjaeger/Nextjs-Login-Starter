@@ -5,7 +5,7 @@ let result, query;
 
 /*************************************/
 
-userController.getUsername = async (req, res) => {
+userController.getUsername = async (req, res, next) => {
 
   const { user_id } = res.locals;
 

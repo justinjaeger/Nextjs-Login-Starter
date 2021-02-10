@@ -3,6 +3,8 @@ import axios from 'axios';
 import cookies from 'next-cookies';
 import { useCookie } from 'next-cookie'
 import App from 'containers/App';
+import parseCookies from 'utils/parseCookies';
+import cookie from 'utils/cookies';
 
 export default function Home(props) { 
 
@@ -97,8 +99,11 @@ export async function getServerSideProps(context) {
         if (res.data.loggedIn) {
           props.loggedIn = true;
           props.username = res.data.username;
-          props.renderFromCookie = false;
-        };
+        };  
+
+        /* sets cookies on client (HAVE to do this for getServerSideProps) */
+        parseCookies(res.data.cookieArray, context);
+
       })
       .catch(err => {
         console.log('something went wrong while verifying access token', err);

@@ -14,7 +14,10 @@ const handler = async (req, res) => {
     await tokenController.getTokenData(req, res);
     /* Delete access token on client and db */
     await tokenController.deleteAccessToken(req, res);
+    /* Delete access token from browser */
+    res.cookie('access_token');
   
+    console.log('res.array', res.cookieArray)
     res.sendCookies();
     return res.json({})
   } 

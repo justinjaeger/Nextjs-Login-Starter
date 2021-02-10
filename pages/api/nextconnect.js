@@ -1,9 +1,6 @@
-import fn from 'utils/connectFunction';
-import fn2 from 'utils/connectFunction2'
-
 import nextConnect from 'next-connect';
 import universalMid from 'utils/universalMid';
-import cookies from 'next-cookies';
+import fn from 'utils/connectFunction'
 
 const handler = nextConnect();
 
@@ -14,19 +11,18 @@ handler.use((req, res, next) => {
 
 // Functionality
 handler.use(async (req, res, next) => {
-
   await fn(req, res, next);
-  console.log('right after calling next')
-  await fn2(req, res, next);
-
   next();
 })
 
 // Return
 handler.use((req, res) => {
-  console.log('sending back data')
+  res.cookie('asshole', 'ass')  
+  console.log('arra', res.cookieArray)
   res.sendCookies();
-  return res.json(res.locals.data)
+
+  console.log('returning this data:', res.data)
+  return res.json(res.data);
 })
 
 export default handler;

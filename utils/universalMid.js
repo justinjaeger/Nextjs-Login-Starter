@@ -9,7 +9,7 @@ const handler = (req, res, next) => {
   res.sendCookies = () => res.setHeader('set-cookie', res.cookieArray);
 
   res.locals = {};
-  res.assholes = {};
+  res.data = {};
 
   /* handles SQL errors, sends 500 status by default */
   res.handleErrors = result => {

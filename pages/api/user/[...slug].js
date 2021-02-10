@@ -8,6 +8,63 @@ import userController from 'controllers/userController';
  * and return the proper data (based on slug) back to the app
  */
 
+import nextConnect from 'next-connect';
+import universalMid from 'utils/universalMid';
+
+// const handler = nextConnect();
+
+// // Universal Middleware
+// handler.use((req, res, next) => {
+//   universalMid(req, res, next);
+// });
+
+// // Functionality
+// handler.use(async (req, res, next) => {
+//   res.locals.access_token = req.body.access_token;
+//   res.data.loggedIn = false;
+  
+//   /* Verify the access_token */
+//   await tokenController.verifyToken(req, res, next);
+
+//   console.log('finished verifyToken')
+
+//   /* Get the action from the slug */
+//   const action = req.query.slug[0];
+
+//   /* All the below functions fetch some user data using the user_id */
+
+//   switch (action) {
+//     case 'home':
+//       /* Fetch the username */
+//       await userController.getUsername(req, res, next);
+//       res.data.username = res.locals.username;
+//       res.data.loggedIn = true;
+//       break;
+
+//     default: /* Fetch something else */
+//   };
+
+//   next();
+// })
+
+// // Return
+// handler.use((req, res) => {
+//   res.cookie('asshole', 'ass')  
+//   console.log('arra', res.cookieArray)
+//   res.sendCookies();
+
+//   console.log('returning this data:', res.data)
+//   return res.json(res.data);
+// })
+
+// export default handler;
+
+
+
+
+
+
+
 const handler = async (req, res) => {
 
   try {
@@ -15,9 +72,7 @@ const handler = async (req, res) => {
   
     /* Verify the access_token */
     await tokenController.verifyToken(req, res);
-
-    console.log('finished verifyToken')
-
+    
     /* Get the action from the slug */
     const action = req.query.slug[0];
 
@@ -38,11 +93,14 @@ const handler = async (req, res) => {
       default: /* Fetch something else */
     };
 
+    res.cookie('assholes', 'ass')
+
     data.username = res.locals.username;
-    console.log('returning this data:', data)
+    data.cookieArray = res.cookieArray;
+
+    res.sendCookies(); // purely for postman tests, cant actually handle cookies set on server
     
-    console.log('cookie array: ', res.cookieArray)
-    res.sendCookies();
+    console.log('ssending back this data:', data)
     return res.json(data)
   } 
 

@@ -6,7 +6,7 @@ let result, query;
 
 /*************************************/
 
-tokenController.verifyToken = async (req, res) => {
+tokenController.verifyToken = async (req, res, next) => {
 
   console.log('inside verifyToken');
 
@@ -26,31 +26,33 @@ tokenController.verifyToken = async (req, res) => {
     console.log('TOKEN EXPIRED');
 
     /* Delete Access Token in browser */
-    res.cookie('access_token');
+    // idk if this is necessary since it will replace it
+    // res.cookie('access_token');
+    console.log(res.cookieArray)
 
     /* DELETE ACCESS TOKEN FROM DB */
-    await tokenController.deleteAccessToken(req, res);
+    result = await tokenController.deleteAccessToken(req, res, next);
+    if (result.end) return;
+    // next()
 
+    console.log('refreshing token... ')
     /* and CREATE NEW ACCESS TOKEN */
-    await tokenController.createAccessToken(req, res);
-
-    /* Set new cookie in browser */
-    res.cookie('access_token', result.access_token, { httpOnly: true })
+    await tokenController.createAccessToken(req, res, next);
   };
 };
 
 /*************************************/
 
-tokenController.createAccessToken = async (req, res) => {
+tokenController.createAccessToken = async (req, res, next) => {
 
   console.log('inside createAccessToken')
 
   const { user_id } = res.locals;
 
   /* Delete cookies in browser */
-  res.cookie('access_token');
-  res.cookie('authenticated');
-  res.cookie('reset_password');
+  // res.cookie('access_token');
+  // res.cookie('authenticated');
+  // res.cookie('reset_password');
 
   /* CREATE ACCESS TOKEN */
   const accessPayload = { user_id };
@@ -65,9 +67,6 @@ tokenController.createAccessToken = async (req, res) => {
   res.handleErrors(result);
   res.handleEmptyResult(result);
 
-  /* SET COOKIE IN BROWSER */
-  res.cookie('access_token', access_token, { httpOnly: true });
-
   /* UPDATE LAST LOGGED IN */
   const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
   query = `
@@ -78,12 +77,15 @@ tokenController.createAccessToken = async (req, res) => {
   res.handleErrors(result);
   res.handleEmptyResult(result);
 
+  /* Set new cookie in browser */
+  res.cookie('access_token', access_token, { httpOnly: true })
+
   res.locals.access_token = access_token;
 };
 
 /*************************************/
 
-tokenController.deleteAccessToken = async (req, res) => {
+tokenController.deleteAccessToken = async (req, res, next) => {
 
   console.log('inside deleteAccessToken')
 
@@ -109,14 +111,18 @@ tokenController.deleteAccessToken = async (req, res) => {
     result = await db.query(query);
     res.handleErrors(result);
 
-    console.log('cookie array: ', res.cookieArray)
-    throw new Error(res);
+    /* Delete cookie from browser */
+    res.cookie('access_token');
+
+    return {end: true};
   };
+
+  return {};
 };
 
 /*************************************/
 
-tokenController.getTokenData = async (req, res) => {
+tokenController.getTokenData = async (req, res, next) => {
 
   console.log('inside getTokenData');
 

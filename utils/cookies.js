@@ -17,8 +17,6 @@ const cookie = (res, name, value, options) => {
     options.maxAge /= 1000;
   }
 
-  // console.log('RES.FINISHED in cookie', res.finished)
-
   if (!value) {
     options.expires = new Date(Date.now() - 1000);
   };
