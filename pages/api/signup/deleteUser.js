@@ -1,29 +1,33 @@
+import wrapper from 'utils/wrapper';
 import signupController from 'controllers/signupController';
-const Cookies = require('cookies');
 
 /**
  * When the user clicks 'Incorrect Email'
  */
 
-let result, payload;
+const handler = async (req, res) => {
 
-export default async function login(req, res) {
-
-  const { email } = req.body;
+  try {
+    res.locals.email = req.body;
   
-  /* Delete User */
-  payload = { email };
-  result = await signupController.deleteUser(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json({ error: result.end });
+    /* Delete User */
+    await signupController.deleteUser(req, res);
+    if (res.finished) return;
+    
+    /* Set verification cookie in browser */
+    // LATER MAKE THIS LOCAL STORAGE
+    res.cookie('sent_verification');
+
+    res.sendCookies();
+    return res.json({
+      message: `Account reset - please enter new email.`
+    });
+  } 
+  catch(e) {
+    console.log('error ', e);
+    return res.status(500).send(e.message);
   };
 
-  /* Clear Cookie */
-  const cookies = new Cookies(req, res);
-  cookies.set('sent_verification');
-
-  return res.json({
-    message: `Account reset - please enter new email.`
-  });
 };
+
+export default wrapper(handler);

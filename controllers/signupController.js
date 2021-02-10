@@ -1,11 +1,11 @@
 import db from 'lib/db';
-const profanityFilter = require('helpers/profanityFilter');
-const usernameFilter = require('helpers/usernameFilter');
+const profanityFilter = require('utils/profanityFilter');
+const usernameFilter = require('utils/usernameFilter');
 const bcrypt = require('bcrypt');
 
 const signupController = {};
-
 let result, query;
+
 /*************************************/
 
 /**
@@ -14,139 +14,140 @@ let result, query;
  * - note: Imports helper functions from the 'misc' folder
  */
 
-signupController.validateEmailAndUsername = (req, res, next) => {
+signupController.validateEmailAndUsername = (req, res) => {
 
-  const { email, username } = req.body;
+  console.log('validateEmailAndUsername')
+
+  const { email, username } = res.locals;
 
   if (!email.includes('@') || !email.includes('.') ) {
-    return { end: { error : 'this email is not properly formatted' } };
+    return res.json({ error: 'This email is not properly formatted.' });
   };
 
   if (username.length > 20) {
-    return { end: { error : 'username cannot be more than 20 characters' } };
-  }
+    return res.json({ error: 'Username cannot be more than 20 characters.' });
+  };
 
   const filterResult = usernameFilter(username);
   if (filterResult.status === false) {
-    return { end: { error : filterResult.message } };
+    return res.json({ error: filterResult.message });
   };
 
   if (profanityFilter(username) === true) {
-    return { end: { error : 'Profanity is not allowed in your username' } };
+    return res.json({ error: 'Profanity is not allowed in your username' });
   };
-
-  return {};
 };
 
 /*************************************/
 
-signupController.validatePassword = (req, res, payload) => {
-  
-  const { password, confirmPassword } = payload;
+signupController.validatePassword = (req, res) => {
+
+  console.log('validatePassword')
+
+  const { password, confirmPassword } = res.locals;
 
   /* check if passwords match */
   if (password !== confirmPassword) {
-    return { end: { error : 'passwords do not match' } };
+    return res.json({ error: 'Passwords do not match.' });
   };
 
   /* check that password is proper length */
   if (password.length < 8) {
-    return { end: { error : 'password must be more than 8 characters' } };
+    return res.json({ error: 'Password must be more than 8 characters.' });
   };
 
   if (password.length > 20) {
-    return { end: { error : 'password must be less than 20 characters' } };
+    return res.json({ error: 'Password must be less than 20 characters.' });
   };
-
-  return {};
 };
 
 /*************************************/
 
-signupController.hashPassword = async (req, res, payload) => {
+signupController.hashPassword = async (req, res) => {
 
-  const { password } = payload;
+  console.log('hashPassword')
+
+  const { password } = res.locals;
 
   /* hash the password using bcrypt */
   result = await bcrypt.hash(password, 8); 
-  if (result.error) return { end: result.error };
+  res.handleErrors(result);
 
-  /* return the password */
-  return { hashedPassword: result };
+  /* store the hashed password */
+  res.locals.hashedPassword = result;
 };
 
 /*************************************/
 
-signupController.createUser = async (req, res, payload) => {
+signupController.createUser = async (req, res) => {
 
-  const { email, username, password } = payload;
+  console.log('createUser')
+
+  const { email, username, hashedPassword } = res.locals;
 
   /* Create new user in database */
   query = `
     INSERT INTO users(email, username, password)
-    VALUES("${email}", "${username}", "${password}")
-  `;
-
+    VALUES("${email}", "${username}", "${hashedPassword}") `;
   result = await db.query(query); 
   if (result.error) {
     /* Handle duplicate entry errors with an error message */
     if (result.error.code === 'ER_DUP_ENTRY') {
       return (result.error.sqlMessage.split('.')[1] === `username'`)
-        ? { end: { error: 'This username is already registered.' } }
-        : { end: { error: 'This email is already registered.' } }
+        ? res.json({ error: 'This username is already registered.' })
+        : res.json({ error: 'This email is already registered.' })
     };
-    console.log('error in createUser:', result.error);
-    return { end: { error: 'an error occured' } };
+    /* If that's not the error, handle it like any other */
+    res.handleErrors(result);
   };
-
-  return {};
+  res.handleEmptyResult(result);
 };
 
 /*************************************/
 
-signupController.authenticateUser = async (req, res, payload) => {
+signupController.authenticateUser = async (req, res) => {
 
-  const { username } = payload;
+  console.log('authenticateUser')
+
+  const { username } = res.locals;
 
   /* Set authentication status to true (0 -> 1) */
   query = `
     UPDATE users
     SET authenticated=1
-    WHERE username="${username}"
-  `;
-  
+    WHERE username="${username}" `;
   result = await db.query(query); 
-  if (result.error) return { end: result.error };
-
-  return {};
+  res.handleErrors(result);
+  res.handleEmptyResult(result);
 };
 
 /*************************************/
 
-signupController.getUserIdByUsername = async (req, res, payload) => {
+signupController.getUserIdByUsername = async (req, res) => {
 
-  const { username } = payload;
+  console.log('getUserIdByUsername')
+
+  const { username } = res.locals;
 
   /* get the user_id from the username */
   query = `
     SELECT user_id
     FROM users
-    WHERE username="${username}"
-  `;
-  
+    WHERE username="${username}" `;
   result = await db.query(query); 
-  if (result.error) return { end: result.error };
+  res.handleErrors(result);
+  res.handleEmptyResult(result);
 
-  const { user_id } = result[0];
-  
-  return { user_id }
+  res.locals.user_id = result[0];
 };
 
 /*************************************/
 
-signupController.markDateCreated = async (req, res, payload) => {
+signupController.markDateCreated = async (req, res) => {
 
-  const { username } = payload;
+  console.log('markDateCreated')
+
+  const { username } = res.locals;
 
   /* get the datetime */
   const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -155,32 +156,27 @@ signupController.markDateCreated = async (req, res, payload) => {
   query = `
     UPDATE users
     SET dateCreated = '${datetime}'
-    WHERE username = '${username}'
-  `;
-
+    WHERE username = '${username}' `;
   result = await db.query(query); 
-  if (result.error) return { end: result.error };
-
-  return {};
+  res.handleErrors(result);
+  res.handleEmptyResult(result);
 };
 
 /*************************************/
 
-signupController.deleteUser = async (req, res, payload) => {
+signupController.deleteUser = async (req, res) => {
 
-  const { email } = payload;
+  console.log('deleteUser')
+
+  const { email } = res.locals;
 
   /* delete the user from database */
   query = `
     DELETE FROM users
-    WHERE email = '${email}'
-  `;
-
+    WHERE email = '${email}' `;
   result = await db.query(query); 
-  if (result.error) return { end: result.error };
-  if (result.affectedRows === 0) return { end: { error: 'did not delete user'} };
-
-  return {};
+  res.handleErrors(result);
+  res.handleEmptyResult(result, { error: 'did not delete user'});
 };
 
 /*************************************/

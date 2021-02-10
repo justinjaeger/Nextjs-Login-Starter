@@ -1,31 +1,33 @@
+import wrapper from 'utils/wrapper';
 import tokenController from 'controllers/tokenController';
-const jwt = require('jsonwebtoken');
-const Cookies = require('cookies');
 
 /**
- * When the user clicks 'Log Out'
+ * When the user clicks Log Out
  */
-let result, payload;
-export default async function logout(req, res) {
 
-  /* Get the access_token */
-  const access_token = req.cookies.access_token;
+const handler = async (req, res) => {
 
-  /* Get the user_id from the token */
-  result = await jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET, {ignoreExpiration: true});
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
+  try {
+    res.locals.access_token = req.cookies.access_token;
+
+    /* Get user_id from token */
+    await tokenController.getTokenData(req, res);
+    if (res.finished) return;
+    /* Delete access token on client and db */
+    await tokenController.deleteAccessToken(req, res);
+    if (res.finished) return;
+
+    /* Delete access token from browser */
+    res.cookie('access_token');
+    
+    res.sendCookies();
+    return res.json({});
+  } 
+  catch(e) {
+    console.log('error ', e);
+    return res.status(500).send(e.message);
   };
-  const { user_id } = result
-  
-  /* Delete access token */
-  payload = { access_token, user_id };
-  result = await tokenController.deleteAccessToken(req, res, payload);
-  if (result.end) {
-    console.log('end: ', result.end)
-    return res.json(result.end);
-  };
 
-  return res.json({});
 };
+
+export default wrapper(handler);

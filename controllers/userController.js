@@ -1,26 +1,23 @@
 import db from 'lib/db';
 
 const userController = {};
-
 let result, query;
 
 /*************************************/
 
-userController.getUsername = async (req, res, payload) => {
+userController.getUsername = async (req, res, next) => {
 
-  const { user_id } = payload;
+  const { user_id } = res.locals;
 
   query = `
     SELECT username 
     FROM users 
-    WHERE user_id=${user_id}
-  `;
+    WHERE user_id=${user_id} `;
   result = await db.query(query);
-  if (result.error) return { end: result.error };
+  res.handleErrors(result);
+  res.handleEmptyResult(result);
 
-  const { username } = result[0];
-
-  return { username };
+  res.locals.username = result[0].username;
 };
 
 /*************************************/

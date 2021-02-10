@@ -2,54 +2,50 @@ import db from 'lib/db';
 const bcrypt = require('bcrypt');
 
 const loginController = {};
-
 let query, result;
 
 /*************************************/
 
-loginController.verifyPassword = async (req, res, payload) => {
+loginController.verifyPassword = async (req, res, next) => {
 
-  const { password, dbPassword } = payload;
+  console.log('verifyPassword')
+
+  const { password, dbPassword } = res.locals;
 
   /* Verify password with bcrypt */
   result = await bcrypt.compare(password, dbPassword);
-  if (result.error) return { end: result.error };
-
-  /* If it returns false, send error back */
+  /* If it returns false, set error on client */
   if (result === false) {
-    return { end: { error: `Credentials do not match` } };
+    return res.json({ error: `Credentials do not match` });
   };
-
-  return {};
-
 };
 
 /*************************************/
 
-loginController.returnUserData = async (req, res, payload) => {
+loginController.returnUserData = async (req, res, next) => {
 
-  const { entryType, emailOrUsername } = payload;
+  console.log('returnUserData')
+
+  const { entryType, emailOrUsername } = res.locals;
 
   /* Fetch email or username based on entry */
   query = `
     SELECT *
     FROM users
-    WHERE ${entryType}="${emailOrUsername}"
-  `;
+    WHERE ${entryType}="${emailOrUsername}" `;
   result = await db.query(query);
-  if (result.error) return { end: result.error };
-
-  /* If no data came back, credentials were invalid */
-  if (result[0] === undefined) {
-    return { end: { error: `Credentials do not match` } };
-  };
+  res.handleErrors(result);
+  res.handleEmptyResult(result, { error: `Credentials do not match` });
 
   /* Deconstruct all the data we just got */
   const { username, email, user_id,  password: dbPassword } = result[0];
-  const authenticated = result[0].authenticated[0]
+  const authenticated = result[0].authenticated[0];
 
-  /* Return the data */
-  return { username, email, user_id, dbPassword, authenticated };
+  res.locals.username = username;
+  res.locals.email = email;
+  res.locals.user_id = user_id;
+  res.locals.dbPassword = dbPassword;
+  res.locals.authenticated = authenticated;
 };
 
 /*************************************/
@@ -61,54 +57,61 @@ loginController.returnUserData = async (req, res, payload) => {
  * - if it returns a user_id, we proceed to next middleware
  */
 
-loginController.ifEmailNoExistDontSend = async (req, res, payload) => {
-  
-  const { email } = payload;
+loginController.ifEmailNoExistDontSend = async (req, res, next) => {
 
-  /* Fetch email or username based on entry */
+  console.log('ifEmailNoExistDontSend')
+  
+  const { email } = res.locals;
+
+  /* Fetch user_id. If no result, user doesn't exist */
   query = `
     SELECT user_id 
     FROM users
-    WHERE email="${email}"
-  `;
+    WHERE email="${email}" `;
   result = await db.query(query);
-  if (result.error) return { end: result.error };
-
-  if (result[0] === undefined) {
-    /* if no result, it means the user doesn't exist
-      But we should send the message anyway in case a hacker
-      is fishing for valid emails */
-    return { end: { 
-      message: `An email was sent to ${req.body.email}.`,
-      route: '/blank',
-    }};
-  };
-
-  /* If we are here, it means the user was found and we continue */
-  return {};
+  res.handleErrors(result);
+  /* If user no exist, We should send the message anyway 
+  in case a hacker is fishing for valid emails */
+  res.handleEmptyResult(result, { 
+    message: `An email was sent to ${res.locals.email}.`,
+    route: '/blank',
+  });
 };
 
 /*************************************/
 
-loginController.updatePassword = async (req, res, payload) => {
+loginController.updatePassword = async (req, res, next) => {
 
-  const { hashedPassword, user_id } = payload;
+  console.log('updatePassword')
+
+  const { hashedPassword, user_id } = res.locals;
 
   /* Update the password in db */
   query = `
     UPDATE users
     SET password="${hashedPassword}"
-    WHERE user_id=${user_id}
-  `;
+    WHERE user_id=${user_id} `;
   result = await db.query(query);
-  if (result.error) return { end: result.error };
+  res.handleErrors(result);
+  res.handleEmptyResult(result);
+};
 
-  /* Check that it actually updated */
-  if (result.affectedRows === 0) {
-    return { end: 'update password unsuccessful' };
+/*************************************/
+
+loginController.verifyEmailAuthenticated = (req, res, next) => {
+
+  console.log('verifyEmailAuthenticated')
+
+  const { authenticated } = res.locals;
+
+  if (authenticated === 0) {
+    console.log('not authenticated')
+    return res.json({ 
+      message: `Please verify the email sent to ${res.locals.email}.`,
+      email: res.locals.email,
+      username: res.locals.username
+    });
   };
-  
-  return {};
 };
 
 /*************************************/
