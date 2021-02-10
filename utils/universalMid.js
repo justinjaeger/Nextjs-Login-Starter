@@ -10,6 +10,15 @@ const handler = (req, res, next) => {
 
   res.locals = {};
   res.data = {};
+  res.next = false; 
+
+  res.result = false;
+  res.func = async (fn) => {
+    let result = await fn(req, res, next);
+    if (result) {
+      return res.json(result)
+    }
+  }
 
   /* handles SQL errors, sends 500 status by default */
   res.handleErrors = result => {
@@ -20,7 +29,7 @@ const handler = (req, res, next) => {
   };
 
   /* 
-    - if message, it sends a data back for frontend to handle
+    - if message, it sends data back for frontend to handle
     - if no message, it throws an error / 500 status
   */
   res.handleEmptyResult = (result, message) => {

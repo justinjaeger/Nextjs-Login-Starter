@@ -6,7 +6,9 @@ let result, query;
 
 /*************************************/
 
-emailController.sendVerificationEmail = (req, res) => {
+emailController.sendVerificationEmail = (req, res, next) => {
+
+  console.log('sendVerificationEmail')
 
   const { email, username } = res.locals;
 
@@ -26,7 +28,9 @@ emailController.sendVerificationEmail = (req, res) => {
 
 /*************************************/
 
-emailController.sendResetPasswordEmail = (req, res) => {
+emailController.sendResetPasswordEmail = (req, res, next) => {
+
+  console.log('sendResetPasswordEmail')
 
   const { email } = res.locals;
 

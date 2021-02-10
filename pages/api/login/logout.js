@@ -12,20 +12,21 @@ const handler = async (req, res) => {
 
     /* Get user_id from token */
     await tokenController.getTokenData(req, res);
+    if (res.finished) return;
     /* Delete access token on client and db */
     await tokenController.deleteAccessToken(req, res);
+    if (res.finished) return;
+
     /* Delete access token from browser */
     res.cookie('access_token');
-  
-    console.log('res.array', res.cookieArray)
+    
     res.sendCookies();
-    return res.json({})
+    return res.json({});
   } 
-
   catch(e) {
-    console.log('error ', e)
+    console.log('error ', e);
     return res.status(500).send(e.message);
-  }
+  };
 
 };
 

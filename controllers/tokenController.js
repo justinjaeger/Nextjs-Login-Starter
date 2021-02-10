@@ -3,6 +3,7 @@ import db from 'lib/db';
 
 const tokenController = {};
 let result, query;
+const tokenExpireTime = '30s';
 
 /*************************************/
 
@@ -25,19 +26,15 @@ tokenController.verifyToken = async (req, res, next) => {
   if (currentTime - expiration > 0) {
     console.log('TOKEN EXPIRED');
 
-    /* Delete Access Token in browser */
-    // idk if this is necessary since it will replace it
-    // res.cookie('access_token');
-    console.log(res.cookieArray)
-
     /* DELETE ACCESS TOKEN FROM DB */
-    result = await tokenController.deleteAccessToken(req, res, next);
-    if (result.end) return;
-    // next()
+    await tokenController.deleteAccessToken(req, res, next);
+    if (res.finished) return;
 
     console.log('refreshing token... ')
+
     /* and CREATE NEW ACCESS TOKEN */
     await tokenController.createAccessToken(req, res, next);
+    if (res.finished) return;
   };
 };
 
@@ -49,14 +46,13 @@ tokenController.createAccessToken = async (req, res, next) => {
 
   const { user_id } = res.locals;
 
-  /* Delete cookies in browser */
-  // res.cookie('access_token');
-  // res.cookie('authenticated');
-  // res.cookie('reset_password');
+  /* Delete cookies in browser if exist */
+  res.cookie('authenticated');
+  res.cookie('reset_password');
 
   /* CREATE ACCESS TOKEN */
   const accessPayload = { user_id };
-  const accessOptions = { expiresIn: '1s'}; /* change the expiration here */
+  const accessOptions = { expiresIn: tokenExpireTime}; /* change the expiration here */
   const access_token = jwt.sign(accessPayload,  process.env.ACCESS_TOKEN_SECRET, accessOptions);
   
   /* SAVE TOKEN IN DB */
@@ -98,7 +94,7 @@ tokenController.deleteAccessToken = async (req, res, next) => {
   result = await db.query(query);
   res.handleErrors(result);
 
-  console.log('token deleted')
+  console.log('token deleted from db')
 
   /* if it affected no rows, that means a hacker already used the access token. 
   Therefore, we delete all user tokens and end middleware chain. */
@@ -114,10 +110,10 @@ tokenController.deleteAccessToken = async (req, res, next) => {
     /* Delete cookie from browser */
     res.cookie('access_token');
 
-    return {end: true};
+    /* Return to stop everything */
+    res.sendCookies(); // just for postman but otherwise ineffective
+    return res.json({ cookieArray: res.cookieArray });
   };
-
-  return {};
 };
 
 /*************************************/

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import cookies from 'next-cookies';
-import { useCookie } from 'next-cookie'
 import App from 'containers/App';
 import parseCookies from 'utils/parseCookies';
-import cookie from 'utils/cookies';
 
 export default function Home(props) { 
 
@@ -88,8 +86,8 @@ export async function getServerSideProps(context) {
     const payload = { access_token: c.access_token };
     /**
      * Request to verify token
-     * The route here is selected based on what is going to load from this index.jsx
-     * At the minimum, we need the username to say "Hi, Username", so that's if we omit a slug
+     * The route here is selected based on what is going to load from this file (index.jsx)
+     * We need the username to say "Hi, Username" for home page, and this loads the home page
      * For other prediction pages which will check the cookie, we'll put a slug there to tell it to send back more data
      * - so long as sticking with SSR, can also just do static loading skeleton w/ client side fetching
      */
@@ -100,10 +98,8 @@ export async function getServerSideProps(context) {
           props.loggedIn = true;
           props.username = res.data.username;
         };  
-
         /* sets cookies on client (HAVE to do this for getServerSideProps) */
         parseCookies(res.data.cookieArray, context);
-
       })
       .catch(err => {
         console.log('something went wrong while verifying access token', err);

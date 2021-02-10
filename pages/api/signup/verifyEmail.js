@@ -16,25 +16,24 @@ const handler = async (req, res) => {
     /* decode and decrypt the username */
     const decoded = decodeURIComponent(username);
     const decryptedUsername = decrypt(decoded);
-
+    res.locals.username = decryptedUsername;
+  
     /* set a cookie in the browser so it loads the re-enter password screen */
     res.cookie('reset_password'); // clears it
     res.cookie('sent_verification'); // clears it
     res.cookie('authenticated', decryptedUsername);
-
-    res.locals.username = decryptedUsername;
-
+  
     /* Authenticate user in db */
     await signupController.authenticateUser(req, res);
-
+    if (res.finished) return;
+    
     res.sendCookies();
     return res.redirect('/');
   } 
-
   catch(e) {
     console.log('error ', e);
     return res.status(500).send(e.message);
-  }
+  };
 
 };
 

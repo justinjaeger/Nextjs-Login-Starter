@@ -16,26 +16,27 @@ const handler = async (req, res) => {
 
     /* Return User Data - use it to authenticate */
     await loginController.returnUserData(req, res);
+    if (res.finished) return;
     /* Verify Password */
-    await loginController.verifyPassword(req, res)
+    await loginController.verifyPassword(req, res);
+    if (res.finished) return;
     /* Verify Email Authentication */
     await loginController.verifyEmailAuthenticated(req, res);
+    if (res.finished) return;
     /* Create Access Token */
     await tokenController.createAccessToken(req, res);
-
-    res.cookie('fuckface', 'fuckface')
+    if (res.finished) return;
+    
     res.sendCookies();
     return res.json({
       loggedIn: true,
       username: res.locals.username
-    })
+    });
   }
-
   catch(e) {
-    console.log('error in /login ', e.message);
+    console.log('error ', e);
     return res.status(500).send(e.message);
-  }
-
+  };
 };
 
 export default wrapper(handler);

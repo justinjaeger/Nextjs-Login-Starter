@@ -8,7 +8,7 @@ import { useCookie } from 'next-cookie'
 function parseCookies(array, context) {
 
   const cookie = useCookie(context);
-  
+
   for (let string of array) {
 
     const arr = string.split(';')
@@ -27,12 +27,9 @@ function parseCookies(array, context) {
       else if (key === 'HttpOnly') key='httpOnly', value=true;
       options[key] = value;
     };
-
-    console.log('key', key, 'value', value, 'options', options)
-
     
-    if (value !== '') cookie.set(key, value, options);
-    if (value === '') cookie.remove(key);
+    if (value !== '') cookie.set(key, value, options)
+    else cookie.remove(key);
 
   };
 };

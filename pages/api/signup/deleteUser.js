@@ -12,7 +12,10 @@ const handler = async (req, res) => {
   
     /* Delete User */
     await signupController.deleteUser(req, res);
-
+    if (res.finished) return;
+    
+    /* Set verification cookie in browser */
+    // LATER MAKE THIS LOCAL STORAGE
     res.cookie('sent_verification');
 
     res.sendCookies();
@@ -20,11 +23,10 @@ const handler = async (req, res) => {
       message: `Account reset - please enter new email.`
     });
   } 
-
   catch(e) {
-    console.log('error ', e)
+    console.log('error ', e);
     return res.status(500).send(e.message);
-  }
+  };
 
 };
 

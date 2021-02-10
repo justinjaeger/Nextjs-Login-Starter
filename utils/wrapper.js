@@ -4,46 +4,36 @@ const wrapper = handler => {
 
   return async (req, res) => {
 
-    /* add a "next" function */
-    // res.next = (arg) => {
-    //   if(bool === true)
-    // };
+  res.cookieArray = [];
+  res.cookie = (name, value, options) => cookie(res, name, value, options);
+  res.sendCookies = () => res.setHeader('set-cookie', res.cookieArray);
 
-    /* add res.locals for passing variables */
-    res.locals = {};
-    
-    /* add cookie functionality */
-    res.cookieArray = [];
-    res.cookie = (name, value, options) => cookie(res, name, value, options)
-    res.sendCookies = () => res.setHeader('set-cookie', res.cookieArray);
+  res.locals = {};
 
-    /* add default error handling */
-    res.handleErrors = result => {
-      if (result.error) {
-        console.log('throwing error in res.handleErrors')
-        throw new Error(result.error);
-      };
+  /* handle SQL errors, send 500 status by default */
+  res.handleErrors = result => {
+    if (result.error) {
+      console.log('error: ', result.error.message)
+      throw new Error(result.error);
     };
-  
-    /* handle empty results from queries
-      - if message, it sends a data back for frontend to handle
-      - if no message, it throws an error / 500 status
-    */
-    res.handleEmptyResult = (result, message) => {
-      // sometimes the response has an affectedRows property
-      if (result.affectedRows) {
-        // if it does, check if it's zero. if so, send error
-        if (result.affectedRows === 0) {
-          if (message) res.json(message) 
-          else throw new Error('Did not affect any rows in db');
-        };
-      // not all queries hav affectedRows property... some queries return data
-      // in that case, if no data is returned, flag it
-      } else if (result[0] === undefined) {
+  };
+
+  /* if message, it sends data back for frontend to handle
+     if no message, it throws an error / 500 status */
+  res.handleEmptyResult = (result, message) => {
+    // first check if affected rows is less than one
+    if (result.affectedRows) {
+      if (result.affectedRows === 0) {
         if (message) res.json(message) 
-        else throw new Error('Did not return any data');
+        else throw new Error('Did not affect any rows in db')
       };
+    /* not all queries hav affectedRows property... some queries return data
+       in that case, if no data is returned, flag it */
+    } else if (result[0] === undefined) {
+      if (message) res.json(message) 
+      else throw new Error('Did not return any data from db')
     };
+  };
     
     return handler(req, res);
   };
