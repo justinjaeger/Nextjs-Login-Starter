@@ -3,7 +3,7 @@ import db from 'lib/db';
 
 const tokenController = {};
 let result, query;
-const tokenExpireTime = '30s';
+const tokenExpireTime = '10m';
 
 /*************************************/
 
