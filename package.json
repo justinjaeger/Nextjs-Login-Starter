@@ -6,9 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "dependencies": {
+    "@next/env": "^10.0.6",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
     "cookie": "^0.4.1",
