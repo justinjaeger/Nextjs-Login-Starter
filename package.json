@@ -18,6 +18,7 @@
     "framer-motion": "^3.3.0",
     "http-proxy": "^1.18.1",
     "jsonwebtoken": "^8.5.1",
+    "msw": "^0.26.2",
     "mysql": "^2.18.1",
     "next": "^10.0.0",
     "next-cookie": "^2.6.0",

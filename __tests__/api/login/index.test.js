@@ -1,7 +1,7 @@
 import db from 'lib/db';
-import login from 'pages/api/login/index';
+import login from 'pages/api/login';
 import logout from 'pages/api/login/logout';
-import signup from 'pages/api/signup/index';
+import signup from 'pages/api/signup';
 import testController from 'controllers/testController'
 
 const username = process.env.TEST_USERNAME;
@@ -25,7 +25,7 @@ describe('/login/index', () => {
       send: jest.fn(),
       setHeader: jest.fn(),
       finished: false,
-      return: undefined,
+      return: undefined, // let's see if we can make this store whatever is returned when we call res.json, like an error message, etc. Then we can test whatever is returned
     };
   });
 
