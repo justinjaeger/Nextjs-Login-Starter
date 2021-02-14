@@ -47,13 +47,13 @@ async function migrate() {
       user_id INT NOT NULL,
     )
 
-    CREATE TABLE IF NOT EXISTS followships (
-      follower_id INT NOT NULL,
-      followee_id INT NOT NULL,
-      dateCreated DATE,
-      PRIMARY KEY (follower_id, followee_id),
-      UNIQUE INDEX (follower_id, followee_id)
-    );
+    CREATE TABLE IF NOT EXISTS followers (
+      username VARCHAR(20) NOT NULL,
+      follower VARCHAR(20) NOT NULL,
+      dateCreated DATETIME,
+      PRIMARY KEY (username, follower),
+      UNIQUE INDEX (username, follower)
+    )
     `)
     console.log('migration ran successfully')
   } catch (e) {

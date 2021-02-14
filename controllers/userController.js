@@ -9,11 +9,11 @@ userController.getUsername = async (req, res) => {
 
   const { user_id } = res.locals;
 
-  query = `
+  result = await db.query(`
     SELECT username 
     FROM users 
-    WHERE user_id=${user_id} `;
-  result = await db.query(query);
+    WHERE user_id=${user_id} 
+  `);
   res.handleErrors(result);
   res.handleEmptyResult(result);
 
