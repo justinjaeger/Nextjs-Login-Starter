@@ -22,7 +22,6 @@ export default function Home(props) {
     </>
   );
 };
- 
 
 /**
  * Fetch all SSR (user specific) props

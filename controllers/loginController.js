@@ -6,7 +6,7 @@ let query, result;
 
 /*************************************/
 
-loginController.verifyPassword = async (req, res, next) => {
+loginController.verifyPassword = async (req, res) => {
 
   console.log('verifyPassword')
 
@@ -22,7 +22,7 @@ loginController.verifyPassword = async (req, res, next) => {
 
 /*************************************/
 
-loginController.returnUserData = async (req, res, next) => {
+loginController.returnUserData = async (req, res) => {
 
   console.log('returnUserData')
 
@@ -57,7 +57,7 @@ loginController.returnUserData = async (req, res, next) => {
  * - if it returns a user_id, we proceed to next middleware
  */
 
-loginController.ifEmailNoExistDontSend = async (req, res, next) => {
+loginController.ifEmailNoExistDontSend = async (req, res) => {
 
   console.log('ifEmailNoExistDontSend')
   
@@ -80,7 +80,7 @@ loginController.ifEmailNoExistDontSend = async (req, res, next) => {
 
 /*************************************/
 
-loginController.updatePassword = async (req, res, next) => {
+loginController.updatePassword = async (req, res) => {
 
   console.log('updatePassword')
 
@@ -98,7 +98,7 @@ loginController.updatePassword = async (req, res, next) => {
 
 /*************************************/
 
-loginController.verifyEmailAuthenticated = (req, res, next) => {
+loginController.verifyEmailAuthenticated = (req, res) => {
 
   console.log('verifyEmailAuthenticated')
 
