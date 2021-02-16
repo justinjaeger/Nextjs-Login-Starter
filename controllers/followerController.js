@@ -42,7 +42,7 @@ followerController.getFollowing = async (req, res) => {
   res.handleErrors(result);
 
   const following = result.map(user => {
-    return { username: user.follower }
+    return { username: user.username }
   });
 
   res.locals.following = following;

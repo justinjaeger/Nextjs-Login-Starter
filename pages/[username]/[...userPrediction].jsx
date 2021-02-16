@@ -14,7 +14,6 @@ function UserPredictions(props) {
   return (
     <>
       <Index />
-      <div>This is / {firstInSlug} / {secondInSlug} </div>
     </>
   );
 }

@@ -3,21 +3,22 @@ import FollowerUnit from 'components/dashboardComponents/FollowerUnit';
 
 function FollowerList(props) { 
 
-  const { array } = props;
-
-  console.log('Rendering Array')
+  const { array, forKey } = props;
 
   /* Create array of components */
   const list = [];
-  for (let i=0; i<array.length; i++) list.push(
-    <FollowerUnit username={array[i].username} />
-  );
-
-  console.log('list', list)
+  for (let i=0; i<array.length; i++) {
+    list.push(
+      <FollowerUnit 
+        username={array[i].username} 
+        key={`${forKey}${i}`}
+      />
+    )
+  };
 
   return (
     <>
-      <div id="follower-list">List: {list}</div>
+      <div id="follower-list">{list}</div>
     </>
   );
 }

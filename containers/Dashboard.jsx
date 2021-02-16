@@ -1,43 +1,53 @@
 import React, { useEffect, useState } from 'react';
-import FollowerList from 'components/dashboardComponents/FollowerList';
 import axios from 'axios';
+import Modal from 'components/Modal'
 
 function Dashboard(props) { 
 
   const { loggedIn, profileUsername, username } = props;
-  const [followerArray, setFollowerArray] = useState([]);
+  const [followerArray, setFollowerArray] = useState([{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},{username: 'asdf'},]);
   const [followingArray, setFollowingArray] = useState([]);
-  
+  const [modal, setModal] = useState(false);
+
   /* Determine if page is YOUR profile or someone else's */
   const isMyProfile = (username === profileUsername) ? true : false;
 
   useEffect(async () => {
-    /* NOTE: FollowerArrays are arrays of objects */
+
     /* Fetch the user's followers */
     await axios.post('/api/followers/getFollowers', { profileUsername })
       .then(res => {
-        console.log('FOLLOWERS 1: ', res.data.followers)
-        setFollowerArray(res.data.followers);
+        /* Push results to follower array (need to copy then set) */
+        const newFollowerArray = followerArray;
+        res.data.followers.forEach(follower => {
+          newFollowerArray.push(follower);
+        });
+        setFollowerArray(newFollowerArray);
       })
       .catch(err => {
         if (err) console.log('something went wrong fetching followers', err);
       })
+
     /* Fetch who the user is following */
     await axios.post('/api/followers/getFollowing', { profileUsername })
     .then(res => {
-      console.log('FOLLOWERS 2: ', res.data.following)
-      setFollowingArray(res.data.following);
+      /* Push results to follower array (need to copy then set) */
+      const newFollowingArray = followingArray;
+      res.data.following.forEach(followee => {
+        newFollowingArray.push(followee);
+      });
+      setFollowingArray(newFollowingArray);
     })
     .catch(err => {
-      if (err) console.log('something went wrong fetching followers', err);
+      if (err) console.log('something went wrong fetching followings', err);
     })
+
   }, []);
 
   /* FOLLOW USER */
   function followUser(profileUsername, username) {
     axios.post('/api/followers/followUser', { profileUsername, username })
       .then(res => {
-        console.log('finished 1', res.data.followers)
         /* update the followers array */
         setFollowerArray(res.data.followers);
       })
@@ -51,7 +61,6 @@ function Dashboard(props) {
     console.log('clicked unfollow user')
     axios.post('/api/followers/unfollowUser', { profileUsername, username })
       .then(res => {
-        console.log('finished 2', res.data.followers)
         /* update the followers array */
         setFollowerArray(res.data.followers);
       })
@@ -63,19 +72,23 @@ function Dashboard(props) {
   /* Load the skeleton until the data has been fetched */
   return (
     <>
-      { (followerArray===[]) || (!followingArray===[]) &&
-        <div>SKELETON...</div>
+      <button onClick={() => setModal('follower')} id="follower-button">Followers: </button>
+      <button onClick={() => setModal('following')} id="follower-button">Following: </button>
+      
+      { (modal==='follower') && 
+        <Modal 
+          title={modal} 
+          array={followerArray}
+          setModal={setModal}
+        />
       }
-
-      <div>Followers: </div>
-      <FollowerList 
-        array={followerArray}
-      />
-
-      <div>Following: </div>
-      <FollowerList 
-        array={followingArray}
-      />
+      { (modal==='following') && 
+        <Modal 
+          title={modal} 
+          array={followingArray}
+          setModal={setModal}
+        />
+      }
 
       { isMyProfile &&
         <div>This is your profile and you are logged in</div>
@@ -88,7 +101,7 @@ function Dashboard(props) {
       ]}
 
       { !loggedIn &&
-        <div>you are not logged in</div>
+        <div></div>
       }
     </>
   );

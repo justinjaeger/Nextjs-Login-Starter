@@ -4,11 +4,13 @@ function FollowerUnit(props) {
 
   const { username } = props;
 
-  console.log('FOLLOWER UNIT: ', username)
+  const link = `/${username}`;
+
+  // the follow button can also go next to their name
 
   return (
     <>
-      <div id="follower-unit">USER: {username}</div>
+      <div id="follower-unit" loading="lazy" ><a href={link}>{username}</a></div>
     </>
   );
 }

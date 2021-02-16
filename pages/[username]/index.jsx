@@ -38,8 +38,6 @@ function UserDashboard(props) {
         user_id={props.user_id}
         profileUsername={profileUsername}
       />
-
-      <div>This is / {profileUsername}.</div>
     </>
   );
 }
